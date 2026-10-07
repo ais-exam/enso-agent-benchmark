@@ -1,6 +1,6 @@
 # SciExam for ENSO website
 
-Project page for *SciExam for ENSO: Can AI Agents Build Climate Models?*, part of [AI's Exam](https://ais-exam.github.io/ai-science-exam-site/).
+Project page for *SciExam for ENSO: Can AI Agents Build Climate Models?*, part of [AI's Exam](https://ais-exam.github.io/).
 
 Live site: https://ais-exam.github.io/enso-agent-benchmark/
 
