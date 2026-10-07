@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="SciExam for ENSO tests whether AI agents can build working climate models from raw ocean data, judged by hidden scientific tests.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SciExam for ENSO: Can AI agents do climate science?">
+<meta property="og:description" content="SciExam for ENSO tests whether AI agents can build working climate models from raw ocean data, judged by hidden scientific tests.">
+<meta property="og:url" content="https://ais-exam.github.io/enso-agent-benchmark/">
+<meta property="og:image" content="https://ais-exam.github.io/enso-agent-benchmark/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SciExam for ENSO: Can AI agents do climate science?">
+<meta name="twitter:description" content="SciExam for ENSO tests whether AI agents can build working climate models from raw ocean data, judged by hidden scientific tests.">
+<meta name="twitter:image" content="https://ais-exam.github.io/enso-agent-benchmark/og.png">
+<style>html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}body{font:14px system-ui,-apple-system,sans-serif}.more{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+</style>
+<title>SciExam for ENSO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Deliberate single look: dark night-ocean opening and results, light chart-paper chapters. */
+:root{
+  color-scheme:light;
+  --night:#fbf9f2; --night2:#ffffff; --night-ink:#1f2529; --night-muted:#5e6a72; --night-line:#e4e1d6;
+  --paper:#f6f5ef; --card:#ffffff; --ink:#141c24; --muted:#56636e; --line:#e2e0d6;
+  --warm:#f28a2e; --warm2:#c8641a; --cold:#2a6fdb; --cold2:#9cc8ff;
+  --land-d:#26313c; --land-l:#cfd5d9;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.65 "IBM Plex Sans",system-ui,sans-serif}
+.serif{font-family:"Schibsted Grotesk",system-ui,sans-serif;letter-spacing:-.02em}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+p{margin:0}
+h1,h2,h3{margin:0;text-wrap:balance}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cold);outline-offset:3px}
+
+/* chapter pill */
+.pill{position:fixed;left:16px;top:calc(14px + env(safe-area-inset-top,0px));z-index:30;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 12px;border-radius:999px;background:rgba(255,255,255,.86);backdrop-filter:blur(8px);color:var(--night-ink);font:500 12px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--night-line)}
+.pill i{display:block;width:8px;height:8px;border-radius:50%;background:var(--warm)}
+.progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--cold),var(--warm));z-index:31;width:0}
+
+/* ---------- opening ---------- */
+.open{padding-top:84px!important;background:radial-gradient(60% 70% at 8% 0%,rgba(120,170,255,.42),transparent 70%),radial-gradient(50% 60% at 95% 8%,rgba(255,220,100,.62),transparent 70%),radial-gradient(40% 45% at 88% 100%,rgba(255,170,90,.2),transparent 70%),#fbf9f2;color:var(--night-ink);display:flex;flex-direction:column;justify-content:center;padding-block:72px 48px;position:relative;overflow:hidden}
+.open .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;width:100%;display:flex;flex-direction:column;gap:20px}
+.kicker{font:500 12px/1.3 "IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--night-muted)}
+.open .tt{font-size:clamp(36px,4.8vw,68px);line-height:1;font-weight:900;letter-spacing:-.015em;max-width:21ch}
+.hl{background:linear-gradient(90deg,rgba(120,170,255,.55),rgba(255,214,90,.8)) no-repeat 0 90%/100% 32%;padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hl-w{background:linear-gradient(transparent 55%,rgba(255,206,64,.62) 55%,rgba(255,206,64,.62) 90%,transparent 90%);padding:0 .06em}
+.hl-c{background:linear-gradient(transparent 55%,rgba(42,111,219,.26) 55%,rgba(42,111,219,.26) 90%,transparent 90%);padding:0 .06em}
+.open .lede{font-size:clamp(17px,1.6vw,21px);color:#3c464d;max-width:62ch}
+.mapbox{position:relative;margin-top:6px}
+.mapbox canvas{display:block;width:100%;aspect-ratio:91/21;border-radius:10px;cursor:ew-resize;touch-action:pan-y}
+.maplabels{position:absolute;inset:0;pointer-events:none;font:500 11px "IBM Plex Mono",monospace;color:var(--night-muted)}
+.maplabels span{position:absolute}
+.readout{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px 24px;margin-top:10px}
+.readout .date{font:700 clamp(26px,3vw,38px)/1 "Schibsted Grotesk",system-ui,sans-serif}
+.readout .state{font:500 14px "IBM Plex Mono",monospace}
+.hint{font-size:13px;color:var(--night-muted)}
+.sparkhd{font-size:13px;color:var(--night-muted);margin-top:14px}.sparkhd b{color:var(--night-ink)}
+.spark{display:block;width:100%;height:130px;margin-top:6px;cursor:ew-resize;touch-action:pan-y}
+.scale{display:flex;align-items:center;gap:8px;font:500 11px "IBM Plex Mono",monospace;color:var(--night-muted)}
+.scale i{display:block;width:120px;height:7px;border-radius:4px;background:linear-gradient(90deg,#9fd0ff,#2f80d6,#faf7ee,#ef7b2c,#ffcf87)}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;text-decoration:none;padding:11px 20px;border-radius:999px;border:1px solid var(--night-line);color:var(--night-ink)}
+.btn.fill{background:#1f2529;color:#fff;border-color:#1f2529}
+.down{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--night-muted);margin-top:8px}
+
+/* ---------- chapters ---------- */
+.chapter{padding-block:clamp(72px,10vw,128px)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+.chead{display:grid;gap:14px;max-width:820px;margin-bottom:44px}
+.cnum{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.chead h2{font:900 clamp(34px,4.6vw,60px)/1.02 "Schibsted Grotesk",system-ui,sans-serif;letter-spacing:-.01em}
+.chead .lede{font-size:clamp(17px,1.5vw,20px);color:var(--muted);max-width:62ch}
+
+/* scrolly: steps left, sticky figure right */
+.scrolly{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:40px;align-items:start}
+.steps{position:relative}
+.stack{position:sticky;top:calc(34vh + env(safe-area-inset-top,0px));display:grid}
+.stack .step{grid-area:1/1;align-self:start;opacity:0;transform:translateY(18px);pointer-events:none;transition:opacity .55s ease,transform .7s cubic-bezier(.2,.8,.2,1),border-color .3s}
+.stack .step.on{opacity:1;transform:none;pointer-events:auto}
+.dots{display:flex;gap:6px;grid-area:2/1;margin-top:14px}.dots i{width:22px;height:4px;border-radius:2px;background:var(--line);transition:background .3s}.dots i.on{background:var(--ink)}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:0 10px 30px -18px rgba(20,28,36,.35);transition:border-color .3s,box-shadow .3s}
+.step.on{border-color:var(--ink);box-shadow:0 14px 36px -16px rgba(20,28,36,.45)}
+.step .k{display:flex;justify-content:space-between;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.step h3{font:700 20px/1.25 "Schibsted Grotesk",system-ui,sans-serif;margin-bottom:6px}
+.step p{font-size:16px;color:#2b3640}
+.figure{position:sticky;top:calc(5vh + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:12px}
+.figtitle{font:700 22px/1.25 "Schibsted Grotesk",system-ui,sans-serif}
+.figsub{font-size:14px;color:var(--muted)}
+.figure canvas{width:100%;display:block;border-radius:8px}
+.note{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.chead.flowhead{display:none}
+.stickhead{margin-bottom:6px;gap:8px}
+.stickhead h2{font-size:clamp(26px,2.5vw,36px)}
+.stickhead .lede{font-size:15px}
+.xsec .figtitle{font-size:18px}
+@media (max-width:860px){
+  .stack{position:static;display:flex;flex-direction:column;gap:50vh;padding-block:10vh 30vh}.stack .step{opacity:.35;transform:none}.stack .step.on{opacity:1}.dots{display:none}
+  .figure{order:-1}.figure.exam{position:static}.xsec .note{display:none}.xsec .figtitle{font-size:16px}.exam .g{opacity:1}
+  .chead.flowhead{display:grid}.stickhead{display:none}
+  .scrolly{grid-template-columns:1fr}
+  .figure{position:sticky;top:56px;background:var(--paper);padding-block:8px;z-index:2}
+  .steps{gap:40vh;padding-block:10vh 20vh}
+}
+.impacts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.impacts div{font-size:14px;padding:8px 10px;border-radius:8px;background:var(--paper)}
+.impacts b{display:block;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase}
+.impacts .w b{color:var(--warm)} .impacts .c b{color:var(--cold)}
+
+/* news */
+.ticker{display:flex;align-items:center;gap:0;border:1px solid var(--night-line);border-radius:10px;overflow:hidden;background:#ffffff}
+.live{flex:none;display:flex;align-items:center;gap:8px;background:#ea7a22;color:#fff;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;padding:9px 12px}
+.live i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.25}}
+.track{overflow:hidden;flex:1;mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.run{display:flex;width:max-content;animation:run 60s linear infinite}
+.track:hover .run{animation-play-state:paused}
+@keyframes run{to{transform:translateX(-50%)}}
+.run a{white-space:nowrap;color:#2a3238;text-decoration:none;font-size:14px;padding:9px 22px;border-right:1px solid var(--night-line)}
+.run a b{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--warm2);margin-right:10px}
+.run a:hover{color:#000;text-decoration:underline}
+.clips{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:1000px){.clips{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.clips{grid-template-columns:1fr}}
+.clip{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);background:#f4f1ea;border-radius:4px;padding:14px 16px 12px;box-shadow:0 12px 30px -14px rgba(0,0,0,.6);transform:rotate(var(--r,0deg));transition:transform .25s}
+.clip:nth-child(1){--r:-.6deg}.clip:nth-child(2){--r:.5deg}.clip:nth-child(3){--r:-.3deg}.clip:nth-child(4){--r:.4deg}
+.clip .rd{margin-top:8px!important}
+.clip .num{margin-top:auto!important;padding-top:6px;font:800 clamp(30px,3.2vw,40px)/1 "Schibsted Grotesk",system-ui,sans-serif;color:var(--warm2);margin-top:4px;font-variant-numeric:tabular-nums}
+.clip .cap{font-size:13px;line-height:1.4;color:#4a4439}
+.clip:hover,.clip:focus-visible{transform:rotate(0) translateY(-3px)}
+.clip .src{display:flex;justify-content:space-between;gap:8px;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #cfc8bb;padding-bottom:6px}
+.clip .src em{font-style:normal;color:#6b6457;font-weight:500}
+.clip .hd{font:700 19px/1.2 "Schibsted Grotesk",system-ui,sans-serif}
+.clip .q{font-size:13.5px;color:#4a4439;font-style:italic}
+.clip .rd{margin-top:auto;font:500 11px "IBM Plex Mono",monospace;color:#9a4a12}
+@media (prefers-reduced-motion:reduce){.run{animation:none}.live i{animation:none}}
+/* hero title */
+.brandline{font:700 clamp(18px,1.8vw,22px) "Schibsted Grotesk",system-ui,sans-serif;color:var(--warm2);letter-spacing:.01em}
+/* impacts map */
+.imp{display:grid;gap:14px}
+.imptop{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.tog{display:inline-grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+.tog button{border:0;background:none;padding:9px 18px;font:600 14px "IBM Plex Sans",sans-serif;cursor:pointer;color:var(--muted)}
+.tog button[aria-pressed="true"].w{background:var(--warm);color:#fff}
+.tog button[aria-pressed="true"].c{background:var(--cold);color:#fff}
+.worldbox{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.world{display:block;width:100%;height:auto}
+.mk{cursor:pointer;outline:none}
+.mk circle.halo{transition:r .25s}
+.mk:hover circle.halo,.mk:focus circle.halo{r:20}
+.mtip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:13.5px;line-height:1.4;padding:9px 12px;border-radius:8px;max-width:240px;display:none;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.mtip b{display:block;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;color:var(--warm2)}
+.legend2{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted)}
+.legend2 span{display:inline-flex;align-items:center;gap:6px}
+/* cross-section */
+.xsec svg{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:14px}
+.vv{display:inline-block;font:italic 600 .92em/1.3 "Source Serif 4",Georgia,serif;background:#fff3c4;color:#7a5a00;border-radius:999px;padding:0 .45em;margin-left:.1em}
+.vv i{font-style:italic}
+.minibars{display:grid;gap:6px;margin-top:10px}
+.minibars div{display:grid;grid-template-columns:70px 1fr 44px;gap:8px;align-items:center;font-size:13px}
+.minibars i{display:block;height:12px;border-radius:2px}
+/* votes */
+.ballot{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+@media (max-width:760px){.ballot{grid-template-columns:1fr}}
+.box{background:var(--card);border:2px solid color-mix(in srgb,var(--c) 45%,var(--line));border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .3s}
+.box.hot{box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 30%,transparent)}
+.box h3{font:700 19px "Schibsted Grotesk",system-ui,sans-serif;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.box h3 .n{font:900 34px "Schibsted Grotesk",system-ui,sans-serif;color:var(--c)}
+.tokens{display:flex;flex-wrap:wrap;gap:10px}
+.tok{display:flex;align-items:center;gap:9px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--paper);font-size:14px;transition:transform .6s cubic-bezier(.2,.9,.3,1.2),opacity .6s}
+.lg{display:inline-grid;place-items:center;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex:none;vertical-align:middle}
+.lg.dk{background:#111}
+.nm .lg{margin-right:8px}
+.tok .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 12px "IBM Plex Mono",monospace;flex:none}
+.tok small{display:block;color:var(--muted);font:500 11px "IBM Plex Mono",monospace}
+.tok.pre{transform:translateY(-40px) scale(.8);opacity:0}
+.split{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:15px;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:12px 16px}
+.split span{max-width:80ch}
+.replay{background:none;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+/* callouts */
+.stage{position:relative;padding:182px 0 196px}
+.cards{position:absolute;inset:0;pointer-events:none;z-index:3}
+.leadsvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
+.co{position:absolute;width:min(230px,22%);background:#fffdf7;border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:0 10px 24px -14px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s;pointer-events:auto}
+.co.show{opacity:1;transform:none}
+.co .t{font:600 10.5px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.co .v{font:800 26px/1.05 "Schibsted Grotesk",sans-serif;margin:2px 0 4px}
+.co p{font-size:12.5px;line-height:1.4;color:#3c464d}
+.co a{font:500 10.5px "IBM Plex Mono",monospace;color:var(--night-muted);text-decoration:none;display:block;margin-top:6px}
+.co a:hover{text-decoration:underline}
+.lead{fill:none;stroke-width:1.4;stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset .6s ease}
+.lead.show{stroke-dashoffset:0}
+.leaddot{transition:opacity .3s}
+.mk.ping circle.halo{animation:ping 1s ease-out}
+@keyframes ping{0%{r:10;opacity:.6}100%{r:30;opacity:0}}
+@media (max-width:820px){.stage{padding:0}.leadsvg{display:none}.cards{position:static;display:grid;gap:10px;padding:12px}.co{position:static;width:auto;opacity:1;transform:none}.leads{display:none}}
+.pill .pi{display:block;height:16px;width:auto}
+.brand{margin:0}.brand svg{display:block;height:clamp(34px,4vw,48px);width:auto;max-width:100%}
+
+/* old news strip */
+.news{display:flex;flex-direction:column;gap:8px;border-left:2px solid var(--warm);padding-left:14px;max-width:760px}
+.news a{color:#2a3238;text-decoration:none;font-size:15px;line-height:1.45}
+.news a:hover,.news a:focus-visible{color:#fff;text-decoration:underline}
+.news small{display:block;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--night-muted)}
+.now{position:absolute;right:10px;bottom:10px;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.1em;background:var(--warm);color:#fff;border:0;border-radius:999px;padding:5px 10px;cursor:pointer}
+/* mirror chart */
+.mir{display:grid;grid-template-columns:1fr minmax(260px,340px);gap:28px;align-items:start}
+@media (max-width:860px){.mir{grid-template-columns:1fr}}
+.mchart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.mhead{display:grid;grid-template-columns:1fr 1fr;font:500 12px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.mhead span:first-child{color:var(--cold);text-align:right;padding-right:14px}.mhead span:last-child{color:var(--warm);padding-left:14px}
+.mrow{display:grid;grid-template-columns:1fr 1fr;align-items:center;min-height:44px;cursor:pointer;border-radius:8px}
+.mrow:hover,.mrow:focus-visible,.mrow.on{background:var(--paper)}
+.mcell{display:flex;align-items:center;gap:10px;padding:4px 14px;font-size:14px}
+.mcell.l{justify-content:flex-end;border-right:1.5px solid var(--ink)}
+.mbar{flex:none;height:22px;border-radius:3px}
+.mcell .v{font:500 13px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mcell .y{color:var(--muted);font-size:13px;white-space:nowrap}
+.maxis{display:grid;grid-template-columns:1fr 1fr;font:500 11px "IBM Plex Mono",monospace;color:var(--muted);margin-top:8px}
+.maxis span:first-child{text-align:left}.maxis span:last-child{text-align:right}
+.mnote{font-size:13px;color:var(--muted);margin-top:12px}
+.minimap canvas{width:100%;display:block;border-radius:8px}
+/* hovmoller */
+.hov{display:grid;grid-template-columns:1fr minmax(260px,340px);gap:28px;align-items:start}
+@media (max-width:860px){.hov{grid-template-columns:1fr}}
+.hovbox{position:relative}
+.hovbox canvas{width:100%;display:block;border-radius:8px;cursor:crosshair}
+.hovaxis{display:flex;justify-content:space-between;font:500 11px "IBM Plex Mono",monospace;color:var(--muted);margin-top:6px}
+.hovline{position:absolute;left:0;right:0;height:0;border-top:1.5px solid var(--ink);pointer-events:none;display:none}
+.side{display:flex;flex-direction:column;gap:14px;position:sticky;top:90px}
+.side .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.side canvas{width:100%;height:150px;display:block}
+.debate2{display:grid;gap:10px}
+.debate2 div{padding:12px 14px;border-radius:10px;background:var(--paper);font-size:15px}
+.debate2 b{display:block;font:700 16px "Schibsted Grotesk",system-ui,sans-serif}
+
+/* exam figure */
+.exam svg{width:100%;height:auto;display:block}
+.exam .g{opacity:.18;transition:opacity .45s}
+.exam .g.on{opacity:1}
+.tests{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.tests .tpick{grid-column:1/-1}
+.tests .t{margin:0;background:#fff;border:1px solid #141c24;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.tests figcaption{display:flex;flex-direction:column;gap:2px}
+.tests figcaption b{font:700 15px "Schibsted Grotesk",system-ui,sans-serif}
+.tests figcaption span{font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tests .td{font-size:11.5px;line-height:1.35;color:var(--muted);margin:4px 0 0}
+.tv{position:relative}.tv svg{display:block;width:100%;height:auto;overflow:visible}
+.tv .ax{fill:none;stroke:#c9cfd4;stroke-width:1}.tv .ci{fill:#2a6fdb;opacity:.16;stroke:none}.tv .tg{fill:none;stroke:#ef7b2c;stroke-width:2;stroke-dasharray:5 4}.tv .md{fill:none;stroke:#2a6fdb;stroke-width:2.6;stroke-linecap:round}
+.tv text{font:500 9px "IBM Plex Mono",monospace;fill:#8a949b}
+.tv .sc{position:absolute;right:0;top:-2px;font:700 13px "IBM Plex Mono",monospace;font-style:normal;color:#141c24;background:#f3f1ea;border-radius:6px;padding:1px 6px}
+.tpick{display:flex;align-items:center;gap:6px;font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tpick span{margin-right:4px}
+.tpick button{font:700 12px "IBM Plex Mono",monospace;width:28px;height:24px;border-radius:6px;border:1px solid #141c24;background:#fff;color:#141c24;cursor:pointer}
+.tpick button.on{background:#141c24;color:#fff}
+@media (max-width:640px){.tests{grid-template-columns:1fr}}
+.mts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 6px}
+.mt{display:flex;flex-direction:column;align-items:center;gap:1px}.mt svg{width:100%;max-width:64px;height:auto}.mt span{font-size:10px;color:#3c464d;text-align:center;line-height:1.15}
+.da{display:flex;flex-direction:column;gap:8px}.da div{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.da em{font:600 10.5px "IBM Plex Mono",monospace;font-style:normal;color:var(--muted);width:100%}.da b{color:#56636e;margin-inline:2px}
+.ch{display:inline-block;font:italic 600 13px/1.5 "Source Serif 4",Georgia,serif;border:1.5px solid var(--c);color:var(--c);border-radius:999px;padding:0 7px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--c);vertical-align:-1px}
+.fc{width:100%;height:auto}.fc text{font:500 9px "IBM Plex Mono",monospace;fill:#56636e}
+
+
+/* results (dark) */
+.dark{background:#f1efe6;color:var(--night-ink)}
+.dark .cnum,.dark .chead .lede{color:var(--night-muted)}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:40px}
+.big>div{border:1px solid var(--night-line);border-radius:14px;padding:20px;background:var(--night2)}
+.big .v{font:900 clamp(48px,6vw,76px)/1 "Schibsted Grotesk",system-ui,sans-serif}
+.big .v small{font-size:.42em;color:var(--night-muted)}
+.big p{color:var(--night-muted);font-size:15px;margin-top:6px}
+.lbkey{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--night-muted);margin-bottom:12px}
+.lbkey span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.lb{display:flex;flex-direction:column;gap:5px}
+.row{display:grid;grid-template-columns:minmax(120px,190px) 1fr 56px;gap:12px;align-items:center;font-size:14px;padding:3px 6px;border-radius:6px}
+.row:hover,.row:focus-visible{background:var(--night2)}
+.row.ref .nm{color:var(--warm2);font-weight:600}
+.nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bb{position:relative;height:15px}
+.bars{display:flex;height:100%;border-radius:3px;overflow:hidden}
+.bars i{display:block;height:100%;transition:width .35s}
+.rl{position:absolute;top:-4px;bottom:-4px;border-left:1.5px dashed var(--warm2);transition:left .35s}
+.tip{position:fixed;z-index:40;pointer-events:none;background:#fff;color:var(--ink);border-radius:10px;padding:10px 12px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none;min-width:200px}
+.tip b{font:700 15px "Schibsted Grotesk",system-ui,sans-serif;display:block;margin-bottom:4px}
+.tip div{display:flex;justify-content:space-between;gap:16px}
+.weights{margin-top:26px;border-top:1px solid var(--night-line);padding-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;align-items:end}
+.weights label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--night-muted)}
+.weights input{width:100%;accent-color:var(--warm)}
+.wout b{font:900 30px "Schibsted Grotesk",system-ui,sans-serif}
+.ghost{background:none;border:1px solid var(--night-line);color:var(--night-ink);border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+
+/* discovery toy */
+.toy{display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:28px;align-items:start}
+@media (max-width:860px){.toy{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--card);padding:10px 8px;font:600 14px "IBM Plex Sans",sans-serif;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.panel label{font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.panel input[type=range]{accent-color:var(--warm)}
+.eqn{font:400 15px "IBM Plex Mono",monospace;background:var(--paper);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.parv{font-size:13px;color:var(--ink)}
+.skew{display:flex;align-items:baseline;gap:10px}
+.skew b{font:900 34px "Schibsted Grotesk",system-ui,sans-serif}
+.histbox canvas{width:100%;height:auto;aspect-ratio:16/9;display:block;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.fams{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:28px}
+.fam{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;border-top:4px solid var(--c)}
+.fam h3{font:700 19px "Schibsted Grotesk",system-ui,sans-serif;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--paper)}
+.either{margin-top:14px;font-size:15px;color:var(--muted)}
+
+/* end */
+.end{background:radial-gradient(50% 80% at 0% 100%,rgba(120,170,255,.4),transparent 70%),radial-gradient(50% 80% at 100% 0%,rgba(255,220,100,.55),transparent 70%),#fbf9f2;color:var(--night-ink);padding-block:clamp(72px,10vw,128px)}
+.end h2{font:900 clamp(38px,5.6vw,76px)/1.02 "Schibsted Grotesk",system-ui,sans-serif;max-width:18ch}
+.end pre{font:400 13px/1.6 "IBM Plex Mono",monospace;background:var(--night2);border:1px solid var(--night-line);border-radius:12px;padding:16px;overflow-x:auto;margin:28px 0 10px}
+.authors{margin-top:34px;color:var(--night-muted);display:grid;gap:6px;font-size:15px}
+.authors .n{color:var(--night-ink);font-size:17px}
+.foot{margin-top:40px;font-size:12.5px;color:var(--night-muted)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+
+<div class="progress" id="prog"></div>
+<div class="pill" aria-live="polite"><svg class="pi" viewBox="-8 -60 154 228" aria-hidden="true"><path d="M2.0 158.0 L106.0 2.0 H136.0 V158.0 H106.0 V62.39 L40.55 158.0 Z" fill="#10141B" stroke="#10141B" stroke-width="4" stroke-linejoin="round"/><circle cx="121.0" cy="-35" r="17" fill="#F37021"/></svg><span id="pillTxt">SciExam for ENSO</span></div>
+
+<!-- ============ OPENING ============ -->
+<header class="open" id="ch0" data-name="SciExam for ENSO">
+  <div class="wrap">
+    <h1 class="brand" aria-label="AI Science Exam"><svg viewBox="-8 -60 1338.2 228" aria-hidden="true"><path d="M2.0 158.0 L106.0 2.0 H136.0 V158.0 H106.0 V62.39 L40.55 158.0 Z" fill="#10141B" stroke="#10141B" stroke-width="4" stroke-linejoin="round"/><circle cx="121.0" cy="-35" r="17" fill="#F37021"/><g transform="translate(196,110.0) scale(0.3125)"><g transform="translate(0,0)"><g transform="translate(0,0)"><path d="M0 160 L103 0 Q117 -4 131 0 L234 160 L195 160 L117 34.5 L39 160 Z" fill="#10141B" stroke="#10141B" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(324,0)"><rect x="0" y="0" width="33" height="160" rx="4" fill="#10141B"/></g></g><g transform="translate(557,0)"><g transform="translate(0,0)"><path d="M190 13 H40 Q14 13 14 40 V54 Q14 80 40 80 H150 Q176 80 176 106 V120 Q176 147 150 147 H0" fill="none" stroke="#F37021" stroke-width="27"/></g><g transform="translate(280,0)"><path d="M190 0 H40 Q0 0 0 40 V120 Q0 160 40 160 H190 V134 H46 Q33 134 33 121 V39 Q33 26 46 26 H190 Z" fill="#F37021" stroke="#F37021" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(560,0)"><rect x="0" y="0" width="33" height="160" rx="4" fill="#F37021"/></g><g transform="translate(683,0)"><rect x="0" y="0" width="190" height="26" rx="4" fill="#F37021"/><path d="M178 57 H38 Q0 57 0 95 V122 Q0 160 38 160 H190 V134 H46 Q33 134 33 121 V96 Q33 83 46 83 H178 Z" fill="#F37021" stroke="#F37021" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(963,0)"><path d="M0 160 V4 Q0 0 6 0 H33 L157 112 V0 H190 V156 Q190 160 184 160 H157 L33 48 V160 Z" fill="#F37021" stroke="#F37021" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(1243,0)"><path d="M190 0 H40 Q0 0 0 40 V120 Q0 160 40 160 H190 V134 H46 Q33 134 33 121 V39 Q33 26 46 26 H190 Z" fill="#F37021" stroke="#F37021" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(1523,0)"><rect x="0" y="0" width="190" height="26" rx="4" fill="#F37021"/><path d="M178 57 H38 Q0 57 0 95 V122 Q0 160 38 160 H190 V134 H46 Q33 134 33 121 V96 Q33 83 46 83 H178 Z" fill="#F37021" stroke="#F37021" stroke-width="5" stroke-linejoin="round"/></g></g><g transform="translate(2470,0)"><g transform="translate(0,0)"><rect x="0" y="0" width="190" height="26" rx="4" fill="#10141B"/><path d="M178 57 H38 Q0 57 0 95 V122 Q0 160 38 160 H190 V134 H46 Q33 134 33 121 V96 Q33 83 46 83 H178 Z" fill="#10141B" stroke="#10141B" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(280,0)"><path d="M0 0 H40 L210 160 H170 Z" fill="#10141B" stroke="#10141B" stroke-width="5" stroke-linejoin="round"/><path d="M170 0 H210 L40 160 H0 Z" fill="#10141B" stroke="#10141B" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(580,0)"><path d="M0 160 L103 0 Q117 -4 131 0 L234 160 L195 160 L117 34.5 L39 160 Z" fill="#10141B" stroke="#10141B" stroke-width="5" stroke-linejoin="round"/></g><g transform="translate(904,0)"><path d="M0 160 V4 Q0 0 6 0 H33 L115 104 L197 0 H224 Q230 0 230 4 V160 H197 V54 L115 156 L33 54 V160 Z" fill="#10141B" stroke="#10141B" stroke-width="5" stroke-linejoin="round"/></g></g></g></svg></h1>
+    <div class="ticker" aria-label="El Niño in the news">
+      <span class="live"><i></i>Live · El Niño 2026</span>
+      <div class="track"><div class="run"><a href="https://news.un.org/en/story/2026/09/1168265" target="_blank" rel="noopener"><b>UN News</b>El Niño is surging. Months of extreme heat could follow</a><a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml" target="_blank" rel="noopener"><b>NOAA Climate Prediction Center</b>El Niño Advisory: “greater than 90% chance of a very strong event” this winter</a><a href="https://news.climate.columbia.edu/2026/10/01/el-nino-2026-how-big-could-it-get/" target="_blank" rel="noopener"><b>Columbia Climate School</b>El Niño 2026: How Big Could It Get?</a><a href="https://weather.com/2026/09/29/news/weather/super-el-nino-us-drought-relief-outlook" target="_blank" rel="noopener"><b>The Weather Channel</b>Over half the US is in drought. Will super El Niño quench it?</a><a href="https://www.bloomberg.com/news/articles/2026-09-04/will-a-super-el-nino-impact-the-weather-and-food-production-in-2026" target="_blank" rel="noopener"><b>Bloomberg</b>Will a ‘Super’ El Niño Impact the Weather and Food Production in 2026?</a><a href="https://news.un.org/en/story/2026/09/1168265" target="_blank" rel="noopener"><b>UN News</b>El Niño is surging. Months of extreme heat could follow</a><a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml" target="_blank" rel="noopener"><b>NOAA Climate Prediction Center</b>El Niño Advisory: “greater than 90% chance of a very strong event” this winter</a><a href="https://news.climate.columbia.edu/2026/10/01/el-nino-2026-how-big-could-it-get/" target="_blank" rel="noopener"><b>Columbia Climate School</b>El Niño 2026: How Big Could It Get?</a><a href="https://weather.com/2026/09/29/news/weather/super-el-nino-us-drought-relief-outlook" target="_blank" rel="noopener"><b>The Weather Channel</b>Over half the US is in drought. Will super El Niño quench it?</a><a href="https://www.bloomberg.com/news/articles/2026-09-04/will-a-super-el-nino-impact-the-weather-and-food-production-in-2026" target="_blank" rel="noopener"><b>Bloomberg</b>Will a ‘Super’ El Niño Impact the Weather and Food Production in 2026?</a></div></div>
+    </div>
+    <div class="clips"><a class="clip" href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml" target="_blank" rel="noopener"><span class="src">NOAA<em>10 Sep 2026</em></span><span class="hd">El Niño Advisory</span><span class="num" data-pre="&gt;" data-to="90" data-suf="%">&gt;90%</span><span class="cap">chance of a very strong event this winter</span><span class="rd">Read ↗</span></a><a class="clip" href="https://news.un.org/en/story/2026/09/1168265" target="_blank" rel="noopener"><span class="src">UN News<em>3 Sep 2026</em></span><span class="hd">El Niño is surging. Months of extreme heat could follow</span><span class="num" data-pre="~" data-to="50" data-suf=" million">~50 million</span><span class="cap">more people pushed into acute hunger, warns the World Food Programme</span><span class="rd">Read ↗</span></a><a class="clip" href="https://weather.com/2026/09/29/news/weather/super-el-nino-us-drought-relief-outlook" target="_blank" rel="noopener"><span class="src">The Weather Channel<em>29 Sep 2026</em></span><span class="hd">Over half the US is in drought. Will super El Niño quench it?</span><span class="num" data-pre="" data-to="40" data-suf=" of 48">40 of 48</span><span class="cap">Lower 48 US states with some drought on the first day of fall</span><span class="rd">Read ↗</span></a><a class="clip" href="https://wmo.int/news/media-centre/new-report-suggests-more-global-temperature-records-ahead" target="_blank" rel="noopener"><span class="src">WMO<em>28 May 2026</em></span><span class="hd">New report suggests more global temperature records ahead</span><span class="num" data-pre="" data-to="2027" data-suf="">2027</span><span class="cap">El Niño raises the chance this becomes the next record-hot year</span><span class="rd">Read ↗</span></a></div>
+    
+    <h2 class="serif tt">SciExam for ENSO: Can AI agents do <span class="hl">climate science</span>?</h2>
+    <p class="lede">This year's El Niño may be the strongest on record, and scientists still debate what drives it. SciExam for ENSO hands AI agents raw ocean data and no answer key, then judges the models they build with hidden scientific tests.</p>
+    <div class="mapbox">
+      <canvas id="heroMap" width="1092" height="252" aria-label="Sea surface temperature anomalies across the tropical Pacific. Move the pointer across the map to travel through time."></canvas>
+      <button class="now" id="nowBtn">Back to now</button>
+      <div class="maplabels" aria-hidden="true">
+        <span style="left:2%;top:6%">Asia & Australia</span>
+        <span style="right:2%;top:6%">The Americas</span>
+        <span style="left:47%;bottom:6%">Equator · 110°E to 70°W</span>
+      </div>
+    </div>
+    <div class="readout">
+      <span class="date" id="heroDate">August 2026</span>
+      <span class="state" id="heroState">Niño 3.4 +1.6 °C · strong El Niño</span>
+      <span class="scale">−3 °C <i></i> +3 °C</span>
+    </div>
+    <p class="sparkhd"><b>Niño 3.4 index</b>, monthly, 1950 to now. The map above shows the month under your pointer.</p>
+    <canvas class="spark" id="heroSpark" width="1180" height="130" aria-label="Niño 3.4 index from 1950 to 2026"></canvas>
+    <p class="hint"><b>What is Niño 3.4?</b> The average sea surface temperature anomaly inside the box on the map, 5°S to 5°N and 170°W to 120°W, the standard yardstick for ENSO. Each bar is one month. Orange bars are warmer than normal, blue bars colder, and several months beyond ±0.5 °C mark an El Niño or a La Niña. Labels mark the strongest events. Move your pointer across the map or the bars to travel from 1950 to now. Values are monthly anomalies from the 1991–2020 average in NOAA ERSSTv5, so they can differ slightly from NOAA's official index, which put Niño 3.4 at +1.8 °C in August 2026.</p>
+    <div class="cta">
+      <a class="btn fill" href="#ch2">Start the story</a>
+      <a class="btn" href="#ch4">Jump to results</a>
+      <a class="btn" href="#end">Paper and code</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ CHAPTER 2 ============ -->
+<section class="chapter" id="ch2" data-name="Chapter 1 · What is ENSO?" style="background:#eef3fb">
+  <div class="wrap">
+    <div class="chead flowhead">
+      <p class="cnum">Chapter one · What is ENSO?</p>
+      <h2>What is ENSO?</h2>
+      <p class="lede">ENSO, short for El Niño–Southern Oscillation, is a natural swing of the tropical Pacific between a warm phase, El Niño, and a cold phase, La Niña, every two to seven years. It arises because the ocean and the winds above it push on each other. Scientists follow it with five numbers, marked on the diagram.</p>
+    </div>
+    <div class="scrolly" data-scrolly="xs">
+      <div class="steps">
+        <div class="step" data-s="normal"><div class="k"><span>Normal</span><span>1/3</span></div><h3>The normal state</h3><p>Trade winds blow from east to west and pile warm surface water in the west, so the warm layer is thick there and thin in the east, where cold water wells up from below. The five numbers measure departures from this state, so here they all sit near zero.</p></div>
+        <div class="step" data-s="nino"><div class="k"><span>El Niño</span><span>2/3</span></div><h3>Warming feeds on itself</h3><p>Westerly wind bursts, gusts lasting days to weeks over the western Pacific, turn the wind there westerly <span class="vv"><i>τ</i></span>. They push surface water east and send warm Kelvin waves along the equator. The current <span class="vv"><i>u</i></span> turns eastward, warm water spreads to the central <span class="vv"><i>T</i><sub>C</sub></span> and eastern Pacific <span class="vv"><i>T</i><sub>E</sub></span>, and the trade winds weaken, which slows the cold upwelling. Bursts grow stronger and more frequent when the central Pacific is warm, so each change warms the east further.</p></div>
+        <div class="step" data-s="nina"><div class="k"><span>La Niña</span><span>3/3</span></div><h3>Stored heat turns the swing around</h3><p>During an El Niño the equatorial Pacific slowly loses heat, and the warm layer in the west thins <span class="vv"><i>h</i><sub>W</sub></span>. This discharge ends the event and can tip the ocean into La Niña. The trade winds strengthen, westerly bursts <span class="vv"><i>τ</i></span> become rare, and colder water returns to the east <span class="vv"><i>T</i><sub>E</sub></span>. The heat then builds up again, and the cycle repeats.</p></div>
+      </div>
+      <div class="figure xsec">
+        <div class="chead stickhead">
+      <p class="cnum">Chapter one · What is ENSO?</p>
+      <h2>What is ENSO?</h2>
+      <p class="lede">ENSO, short for El Niño–Southern Oscillation, is a natural swing of the tropical Pacific between a warm phase, El Niño, and a cold phase, La Niña, every two to seven years. It arises because the ocean and the winds above it push on each other. Scientists follow it with five numbers, marked on the diagram.</p>
+    </div>
+        <p class="figtitle" id="xsTitle">Normal conditions</p>
+        <svg viewBox="0 0 900 420" role="img" aria-label="Cross-section of the equatorial Pacific">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f8fa"/><stop offset="1" stop-color="#e9eef2"/></linearGradient>
+            <linearGradient id="sst" x1="0" x2="1"><stop offset="0" stop-color="#ef7b2c"/><stop offset=".55" id="sstMid" stop-color="#f0a46f"/><stop offset="1" id="sstEast" stop-color="#7fb4e6"/></linearGradient>
+            <marker id="wa" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#56636e"/></marker>
+            <marker id="wa2" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.4" markerHeight="3.4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ffffff"/></marker>
+            <marker id="ua" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#9fd0ff"/></marker>
+          </defs>
+          <rect width="900" height="150" fill="url(#sky)"/>
+          <rect y="150" width="900" height="270" fill="#1f4f86"/>
+          <path id="warm" fill="url(#sst)" opacity=".95"/>
+          <path id="thermo" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="7 6"/>
+          <text id="thLbl" x="450" font-family="IBM Plex Mono" font-size="12" fill="#ffffff" text-anchor="middle">thermocline</text>
+          <g id="cloud"><ellipse cx="0" cy="70" rx="70" ry="26" fill="#b9c4cd"/><ellipse cx="-38" cy="82" rx="44" ry="20" fill="#c9d2d9"/><ellipse cx="40" cy="84" rx="48" ry="20" fill="#c9d2d9"/><g stroke="#6aa7de" stroke-width="2"><line x1="-30" y1="104" x2="-38" y2="128"/><line x1="0" y1="106" x2="-8" y2="132"/><line x1="30" y1="104" x2="22" y2="128"/></g><text y="40" text-anchor="middle" font-family="IBM Plex Mono" font-size="12" fill="#56636e">convection</text></g>
+          <path id="walker" fill="none" stroke="#6f7d87" stroke-width="2.2" stroke-dasharray="4 5" marker-end="url(#wa)"/><text id="walkLbl" font-family="IBM Plex Mono" font-size="11" fill="#4f5b63">Walker circulation</text>
+          <g id="winds" stroke="#56636e" fill="none" marker-end="url(#wa)"></g>
+          <text x="790" y="104" font-family="IBM Plex Mono" font-size="12" fill="#56636e" text-anchor="end" id="windLbl">trade winds</text>
+          <g id="upw" stroke="#9fd0ff" stroke-width="3" fill="none" marker-end="url(#ua)"><path d="M770 395 C 770 330 780 280 790 225"/><path d="M820 398 C 820 330 826 290 832 235"/></g>
+          <path d="M0 150 L70 150 L70 420 L0 420 Z" fill="#c4ccd2"/><text x="8" y="140" font-family="IBM Plex Mono" font-size="11" fill="#56636e">Indonesia</text>
+          <path d="M860 150 L900 150 L900 420 L860 420 Z" fill="#c4ccd2"/><text x="892" y="140" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#56636e">South America</text>
+          <g id="vars" font-family="Schibsted Grotesk,system-ui,sans-serif" font-size="15" font-weight="700">
+            <g id="vTC"><rect x="268" y="156" width="244" height="34" rx="6" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="5 4"/><rect x="276" y="162" width="46" height="22" rx="11" fill="#fff"/><text x="299" y="178" text-anchor="middle" fill="#1f2529" font-style="italic">T<tspan font-size="10" dy="3">C</tspan></text><text x="330" y="178" font-size="13" font-weight="500" font-family="IBM Plex Mono" fill="#fff">central temperature</text></g>
+            <g id="vTE"><rect x="516" y="156" width="294" height="34" rx="6" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="5 4"/><rect x="524" y="162" width="46" height="22" rx="11" fill="#fff"/><text x="547" y="178" text-anchor="middle" fill="#1f2529" font-style="italic">T<tspan font-size="10" dy="3">E</tspan></text><text x="578" y="178" font-size="13" font-weight="500" font-family="IBM Plex Mono" fill="#fff">eastern temperature</text></g>
+            <g id="vU"><path id="uArrow" stroke="#fff" stroke-width="2.6" fill="none" marker-end="url(#wa2)"/><rect id="uChip" y="206" width="34" height="22" rx="11" fill="#fff"/><text id="uTxt" y="222" text-anchor="middle" fill="#1f2529" font-style="italic">u</text><text id="uLbl" y="246" text-anchor="middle" font-size="13" font-weight="500" font-family="IBM Plex Mono" fill="#fff">current</text></g>
+            <g id="vH"><path id="hBar" stroke="#ffd95a" stroke-width="2.4" fill="none"/><rect id="hChip" x="96" width="44" height="22" rx="11" fill="#ffd95a"/><text id="hTxt" x="118" text-anchor="middle" fill="#1f2529" font-style="italic">h<tspan font-size="10" dy="3">W</tspan></text><text id="hLbl" x="146" font-size="13" font-weight="500" font-family="IBM Plex Mono" fill="#fff">thermocline depth</text></g>
+            <g id="vTau"><rect x="236" y="128" width="34" height="20" rx="10" fill="#1f2529"/><text x="253" y="143" text-anchor="middle" fill="#fff" font-style="italic">τ</text><text x="276" y="143" font-size="13" font-weight="500" font-family="IBM Plex Mono" fill="#1f2529">wind bursts</text></g>
+          </g>
+          <text x="90" y="410" font-family="IBM Plex Mono" font-size="11" fill="#9fb3c4">west · warm pool</text><text x="845" y="410" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#9fb3c4">east · cold upwelling</text>
+        </svg>
+        <div class="note"><span><b>Five numbers describe the system.</b> <i>T</i><sub>C</sub>, <i>T</i><sub>E</sub> sea surface temperature in the central and eastern Pacific, <i>h</i><sub>W</sub> thermocline depth in the west, <i>u</i> ocean current in the central Pacific, <i>τ</i> zonal wind in the western Pacific, which turns westerly when westerly wind bursts blow. The agents build models of these five. Schematic after the standard ENSO diagram, see <a href="https://www.climate.gov/enso" target="_blank" rel="noopener">NOAA Climate.gov</a>. Not to scale.</span><span id="xsNote">Easterly trade winds, warm pool in the west</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 3 ============ -->
+<section class="chapter" id="ch3" data-name="Chapter 2 · The exam">
+  <div class="wrap">
+    <div class="chead flowhead">
+      <p class="cnum">Chapter two · The exam</p>
+      <h2>Six hours, real data, and tests the agents never see.</h2>
+      <p class="lede">Usually an AI benchmark checks answers against a key. Here the agent must build a working model of a real climate system, keep revising it against its own checks, and hand it in to be examined.</p>
+    </div>
+    <div class="scrolly" data-scrolly="exam">
+      <div class="steps">
+        <div class="step" data-s="0"><div class="k"><span>Step 1</span><span>1/4</span></div><h3>Raw observations</h3><p>Each agent gets 35 years of gridded ocean and wind data, 1980 to 2014, and turns it into five monthly indices. A data check must pass before modelling starts.</p></div>
+        <div class="step" data-s="1"><div class="k"><span>Step 2</span><span>2/4</span></div><h3>Write its own checks, then lock them</h3><p>The agent decides how a good model should be judged and writes the diagnostics. They are then frozen, so the yardstick cannot drift toward whatever the model does.</p></div>
+        <div class="step" data-s="2"><div class="k"><span>Step 3</span><span>3/4</span></div><h3>Build, check, revise</h3><p>The agent writes a first model and fits it to the data. It runs its locked checks, reads the results, and revises the equations, the noise or the nonlinear terms. It repeats this loop as often as it likes within the six hours, then submits the model it chooses. It never sees a score.</p></div>
+        <div class="step" data-s="3"><div class="k"><span>Step 4</span><span>4/4</span></div><h3>Three hidden tests</h3><p>After the run, the model must reproduce 70 years of ENSO statistics, forecast 2015 to 2024, years the agent never saw, and recover variables it is not shown. A published model takes the same tests.</p></div>
+      </div>
+      <div class="figure exam">
+        <div class="chead stickhead">
+      <p class="cnum">Chapter two · The exam</p>
+      <h2>Six hours, real data, and tests the agents never see.</h2>
+      <p class="lede">Usually an AI benchmark checks answers against a key. Here the agent must build a working model of a real climate system, keep revising it against its own checks, and hand it in to be examined.</p>
+    </div>
+        <svg viewBox="0 0 620 212" role="img" aria-label="The exam pipeline">
+          <g class="g" data-g="0"><rect x="10" y="20" width="170" height="110" rx="12" fill="#fff" stroke="#141c24"/><text x="95" y="56" text-anchor="middle" font-family="Schibsted Grotesk" font-weight="700" font-size="17">Observations</text><text x="95" y="80" text-anchor="middle" font-size="13" fill="#56636e">1980–2014</text><g transform="translate(40,92)"><rect width="18" height="18" fill="#2f80d6"/><rect x="22" width="18" height="18" fill="#9fd0ff"/><rect x="44" width="18" height="18" fill="#ef7b2c"/><rect x="66" width="18" height="18" fill="#ffcf87"/><rect x="88" width="18" height="18" fill="#2f80d6"/></g></g>
+          <g class="g" data-g="1"><path d="M180 75 H230" stroke="#141c24" stroke-width="2" marker-end="url(#ar)"/><rect x="230" y="20" width="170" height="110" rx="12" fill="#fff" stroke="#141c24"/><text x="315" y="56" text-anchor="middle" font-family="Schibsted Grotesk" font-weight="700" font-size="17">Own checks</text><g transform="translate(296,70)" fill="none" stroke="#2f80d6" stroke-width="3"><rect x="0" y="16" width="38" height="28" rx="4" fill="#2f80d6" stroke="none"/><path d="M8 16 V8 a11 11 0 0 1 22 0 V16"/></g><text x="315" y="124" text-anchor="middle" font-size="12" fill="#2f80d6" font-family="IBM Plex Mono">LOCKED</text></g>
+          <g class="g" data-g="2"><path d="M400 75 H450" stroke="#141c24" stroke-width="2" marker-end="url(#ar)"/><rect x="450" y="20" width="160" height="110" rx="12" fill="#141c24"/><text x="530" y="56" text-anchor="middle" font-family="Schibsted Grotesk" font-weight="700" font-size="17" fill="#fff">Its model</text><text x="530" y="86" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" fill="#ffcf87">dT = f(T) dt</text><text x="530" y="106" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" fill="#9fd0ff">+ σ(T) dW</text><path d="M480 130 C480 168 345 168 345 136" fill="none" stroke="#2a6fdb" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arb)"/><text x="412" y="176" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2a6fdb">check · revise · repeat</text></g>
+          <g class="g" data-g="3"><path d="M530 130 V188 H120 V212 M530 188 V212 M325 188 V212" fill="none" stroke="#141c24" stroke-width="2"/></g>
+          <defs><marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#2a6fdb"/></marker><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#141c24"/></marker></defs>
+        </svg>
+<div class="g tests" data-g="3">
+          <div class="tpick" role="group" aria-label="Illustrative models"><span>Illustrative models</span><button data-m="0" class="on">A</button><button data-m="1">B</button><button data-m="2">C</button></div>
+          <figure class="t" data-t="stat"><figcaption><b>Looks like ENSO?</b><span>Statistics</span></figcaption>
+            <div class="tv"><em class="sc">0.00</em><svg viewBox="0 0 200 96" aria-hidden="true"><path class="ax" d="M8 86 H192"/><path class="ci" d=""/><path class="tg" d=""/><path class="md" d=""/><text x="8" y="94">cold</text><text x="192" y="94" text-anchor="end">warm</text></svg></div><p class="td">Matches 70 years of observed statistics.</p></figure>
+          <figure class="t" data-t="dyn"><figcaption><b>Coupled correctly?</b><span>Dynamical consistency</span></figcaption>
+            <div class="tv"><em class="sc">0.00</em><svg viewBox="0 0 200 96" aria-hidden="true"><path class="ax" d="M8 48 H192"/><path class="ci" d=""/><path class="tg" d=""/><path class="md" d=""/><text x="8" y="94">1980</text><text x="192" y="94" text-anchor="end">2014</text></svg></div><p class="td">Recovers the variables it is not shown.</p></figure>
+          <figure class="t" data-t="pred"><figcaption><b>Forecasts the future?</b><span>Prediction</span></figcaption>
+            <div class="tv"><em class="sc">0.00</em><svg viewBox="0 0 200 96" aria-hidden="true"><path class="ax" d="M8 6 V86 H192"/><path class="ci" d=""/><path class="tg" d=""/><path class="md" d=""/><text x="8" y="94">1 month</text><text x="192" y="94" text-anchor="end">12 months</text></svg></div><p class="td">Beats persistence 1 to 12 months ahead.</p></figure>
+        </div>
+        <div class="note"><span>Illustrative curves, not real results. Solid lines are a model with its shaded 95% confidence interval, dashed lines the target: observations, or persistence for forecasts. Each test is scored from 0 to 1. Graders, reference model and post-2014 data stay outside the agent's container.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 4 ============ -->
+<section class="chapter dark" id="ch4" data-name="Chapter 3 · The scores">
+  <div class="wrap">
+    <div class="chead">
+      <p class="cnum">Chapter three · The scores</p>
+      <h2 class="serif">Six of twelve agents outscored a published model.</h2>
+      <p class="lede">The reference model was published in the Journal of Climate and developed with observations from every test period. The agents had only 1980 to 2014. Hover a row for its three scores, or change the weights and watch the ranking move.</p>
+    </div>
+    <div class="big">
+      <div><div class="v">6<small> / 12</small></div><p>agent systems score higher than the published reference</p></div>
+      <div><div class="v">0.515</div><p>top composite score, Claude Fable 5.1, against 0.378 for the reference</p></div>
+      <div><div class="v">12<small> / 12</small></div><p>forecast lead times where the top model beats persistence for both indices</p></div>
+    </div>
+    <div class="lbkey"><span style="--c:#7e9cb3">Statistics</span><span style="--c:#2f80d6">Dynamical consistency</span><span style="--c:#ef7b2c">Prediction</span><span style="--c:transparent;border-left:1.5px dashed var(--warm2);padding-left:6px">Reference model</span></div>
+    <div class="lb" id="lb" role="list"></div>
+    <div class="weights">
+      <label for="wS">Weight on statistics <span class="mono" id="wSv">0.30</span><input type="range" id="wS" min="0" max="100" value="30"></label>
+      <label for="wD">Weight on dynamical consistency <span class="mono" id="wDv">0.30</span><input type="range" id="wD" min="0" max="100" value="30"></label>
+      <label for="wP">Weight on prediction <span class="mono" id="wPv">0.40</span><input type="range" id="wP" min="0" max="100" value="40"></label>
+      <div class="wout"><b id="beat">6</b> above the reference <button class="ghost" id="resetW">Paper weights</button></div>
+    </div>
+    <p class="more"><a class="btn" href="results/" target="_blank" rel="noopener">See every model in detail →</a><a class="btn" href="results/equations.html" target="_blank" rel="noopener">Model equations →</a></p>
+  </div>
+</section>
+<div class="tip" id="tip"></div>
+
+<!-- ============ CHAPTER 5 ============ -->
+<section class="chapter" id="ch5" data-name="Chapter 4 · The discovery">
+  <div class="wrap">
+    <div class="chead">
+      <p class="cnum">Chapter four · The discovery</p>
+      <h2>Without being told, the agents rebuilt both sides of the debate.</h2>
+      <p class="lede">El Niños grow stronger than La Niñas. Since 1950 the strongest El Niño warmed the eastern Pacific by 3.3 °C, while the strongest La Niña cooled it by only 2.0 °C, and scientists still debate why. Strip each strong model down to the terms that matter and it keeps one of two explanations, either of which makes the warm swings outgrow the cold ones. Try them yourself.</p>
+    </div>
+    <div class="toy">
+      <div class="panel">
+        <div class="seg" role="group" aria-label="Mechanism">
+          <button id="mA" aria-pressed="true">Noise grows with warmth</button>
+          <button id="mB" aria-pressed="false">Nonlinear feedback</button>
+        </div>
+        <div class="eqn" id="eqn">dT = −T dt + σ(1 + b·T) dW</div>
+        <label for="str"><span id="parLbl">b, how fast the noise grows with temperature</span> <input type="range" id="str" min="0" max="100" value="55"><span class="mono parv" id="parV">b = 0.50</span></label>
+        <div class="skew"><b class="mono" id="skewV">0.00</b><span>skewness of the simulated temperature. Zero means warm and cold swings are equally strong.</span></div>
+        <p class="figsub"><b>Toy model.</b> One made-up equation for a single temperature <i>T</i>, run in your browser to show how each mechanism tilts the swings. It is not one of the agents' models.</p>
+      </div>
+      <div class="histbox"><canvas id="hist" width="1100" height="619" aria-label="Histogram of simulated temperature anomalies"></canvas></div>
+    </div>
+    <div class="ballot" id="ballot">
+      <div class="box" id="boxA" style="--c:var(--cold)"><h3>Noise grows with warmth <span class="n">4</span></h3><div class="tokens" id="tokA"></div></div>
+      <div class="box" id="boxB" style="--c:var(--warm)"><h3>Nonlinear feedback <span class="n">5</span></h3><div class="tokens" id="tokB"></div></div>
+    </div>
+    <div class="split"><span><b style="color:var(--ink)">GPT-5.5 could vote either way.</b> Its model reduces to either form with scores 0.3 percentage points apart (0.398 and 0.395), so the tests cannot tell which one it needs. That is exactly why scientists have not settled the question.</span><button class="replay" id="replay">Replay the vote</button></div>
+    <p class="figsub" style="margin-top:10px">Each badge is an agent's final model after removing the terms it did not need, with the composite score of that reduced model. Logos mark each model's provider.</p>
+  </div>
+</section>
+
+<!-- ============ END ============ -->
+<section class="end" id="end" data-name="Epilogue · The paper">
+  <div class="wrap">
+    <p class="cnum" style="color:var(--night-muted)">Epilogue</p>
+    <h2>AI agents can already propose climate models worth a scientist's time.</h2>
+    <div class="cta" style="margin-top:28px"><a class="btn fill" href="#end">Paper (coming soon)</a><a class="btn" href="https://github.com/ylzhang2447/SciExam-ENSO-code" target="_blank" rel="noopener">Code and data</a></div>
+    <pre id="bib">@article{zhang2026sciexam,
+  title  = {SciExam for ENSO: Can AI Agents Build Climate Models?},
+  author = {Zhang, Yinling and Liu, Langchen and Xiu, Dongbin and Zou, Xueyan
+            and Kuang, Xu and Wang, Mengdi and Liu, Shilong},
+  year   = {2026}
+}</pre>
+    <button class="ghost" id="copyBib">Copy BibTeX</button>
+    <div class="authors"><div class="n">Yinling Zhang¹, Langchen Liu², Dongbin Xiu¹, Xueyan Zou³, Xu Kuang⁴, Mengdi Wang⁵, Shilong Liu⁵</div><div>¹The Ohio State University · ²Yale University · ³University of California, San Diego · ⁴Stanford University · ⁵Princeton University</div></div>
+    <p class="foot">Sea surface temperature anomalies from NOAA ERSSTv5 (1991–2020 base period), January 1950 to August 2026. The paper link will be added on release.</p>
+  </div>
+</section>
+
+<script src="ersst_data.js"></script>
+<script>
+// ---------- data ----------
+const M=SST_META, NT=M.nt, NY=M.ny, NX=M.nx;
+const RAW=Uint8Array.from(atob(SST_B64),c=>c.charCodeAt(0));
+const Q=new Int8Array(RAW.buffer);
+const val=(t,y,x)=>{const q=Q[(t*NY+y)*NX+x];return q===-128?NaN:q*M.scale;};
+const [Y0,M0]=M.start.split('-').map(Number);
+const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const dateOf=t=>{const m=(M0-1+t)%12, y=Y0+Math.floor((M0-1+t)/12);return {y,m,txt:MON[m]+' '+y};};
+const idxOf=(y,m)=>(y-Y0)*12+(m-(M0-1));
+const N34=M.n34;
+function phase(v){const a=Math.abs(v);if(a<0.5)return 'neutral';const k=a>=1.5?'strong ':a>=1?'moderate ':'weak ';return k+(v>0?'El Niño':'La Niña');}
+
+// ---------- colour map (zero colour supplied per surface) ----------
+const STOPS=[[-3,[159,208,255]],[-1.6,[47,128,214]],[0,null],[1.6,[239,123,44]],[3,[255,207,135]]];
+function col(v,zero){
+  if(isNaN(v))return null;
+  v=Math.max(-3,Math.min(3,v));
+  for(let i=0;i<STOPS.length-1;i++){const [a,ca]=STOPS[i],[b,cb]=STOPS[i+1];
+    if(v<=b){const f=(v-a)/(b-a),A=ca||zero,B=cb||zero;return [A[0]+(B[0]-A[0])*f,A[1]+(B[1]-A[1])*f,A[2]+(B[2]-A[2])*f];}}
+  return STOPS[4][1];
+}
+// render one month to a canvas by bilinear interpolation over the 2° grid
+function drawMap(cv,t,zero,land){
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height,img=ctx.createImageData(W,H),d=img.data;
+  for(let py=0;py<H;py++){
+    const gy=(1-(py+0.5)/H)*(NY-1), y0=Math.floor(gy), y1=Math.min(NY-1,y0+1), fy=gy-y0;
+    for(let px=0;px<W;px++){
+      const gx=(px+0.5)/W*(NX-1), x0=Math.floor(gx), x1=Math.min(NX-1,x0+1), fx=gx-x0;
+      const v00=val(t,y0,x0),v10=val(t,y0,x1),v01=val(t,y1,x0),v11=val(t,y1,x1);
+      let s=0,w=0;const add=(v,ww)=>{if(!isNaN(v)){s+=v*ww;w+=ww;}};
+      add(v00,(1-fx)*(1-fy));add(v10,fx*(1-fy));add(v01,(1-fx)*fy);add(v11,fx*fy);
+      const i=(py*W+px)*4;
+      if(w<0.5){d[i]=land[0];d[i+1]=land[1];d[i+2]=land[2];}
+      else{const c=col(s/w,zero);d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];}
+      d[i+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+  // equator and Niño 3.4 box
+  ctx.strokeStyle='rgba(31,37,41,.35)';ctx.setLineDash([4,5]);ctx.lineWidth=1;
+  const yEq=H/2;ctx.beginPath();ctx.moveTo(0,yEq);ctx.lineTo(W,yEq);ctx.stroke();
+  const lx=l=>(l-M.lon0)/((NX-1)*2)*W, ly=la=>(1-(la-M.lat0)/((NY-1)*2))*H;
+  ctx.setLineDash([]);ctx.strokeStyle='rgba(31,37,41,.7)';ctx.strokeRect(lx(190),ly(5),lx(240)-lx(190),ly(-5)-ly(5));
+  ctx.fillStyle='rgba(31,37,41,.85)';ctx.font='500 '+Math.round(H/16)+'px IBM Plex Mono, monospace';ctx.fillText('Niño 3.4',lx(190)+4,ly(5)-6);
+}
+const DARK0=[250,247,238], LIGHT0=[236,240,242], LANDD=[214,210,198], LANDL=[207,213,217];
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- opening: time travel with the pointer ----------
+(function(){
+  const map=document.getElementById('heroMap'), sp=document.getElementById('heroSpark');
+  const dEl=document.getElementById('heroDate'), sEl=document.getElementById('heroState');
+  let cur=NT-1, last=-1;
+  // strongest peaks and troughs of this series (local extremes over ±12 months)
+  const EV=[[1972,11,'1972–73'],[1982,11,'1982–83'],[1997,10,'1997–98'],[2015,11,'2015–16'],[2023,11,'2023–24'],[1955,10,'1955–56'],[1973,11,'1973–74'],[1988,11,'1988–89'],[2010,9,'2010–11']];
+  function spark(){
+    const c=sp.getContext('2d'),W=sp.width,H=sp.height,mid=H/2;c.clearRect(0,0,W,H);
+    const x=t=>t/(NT-1)*W, y=v=>mid-v/3*(mid-24);
+    c.strokeStyle='#d8d4c8';c.beginPath();c.moveTo(0,mid);c.lineTo(W,mid);c.stroke();
+    for(let t=0;t<NT;t++){const v=N34[t];c.fillStyle=v>0?'rgba(239,123,44,.9)':'rgba(42,111,219,.85)';const h=Math.abs(y(v)-mid);c.fillRect(x(t),v>0?y(v):mid,Math.max(1,W/NT),h);}
+    c.font='500 11px IBM Plex Mono, monospace';c.fillStyle='#8b949a';
+    for(let yy=1960;yy<=2020;yy+=10){c.fillText(yy,x(idxOf(yy,0))+2,H-3);}
+    c.font='600 11px IBM Plex Mono, monospace';c.textAlign='center';
+    EV.forEach(([yy,mm,l])=>{const t=idxOf(yy,mm),v=N34[t],up=v>0,yy0=y(v);
+      c.fillStyle=up?'#c8641a':'#1f5fc4';c.beginPath();c.arc(x(t),yy0,3,0,7);c.fill();
+      c.fillText(l,Math.max(24,Math.min(W-24,x(t))),up?yy0-8:yy0+16);});
+    const tn=NT-1,vn=N34[tn];c.fillStyle='#1f2529';c.beginPath();c.arc(x(tn)-3,y(vn),4,0,7);c.fill();c.textAlign='right';c.fillText('Now',x(tn)-10,y(vn)+4);
+    c.textAlign='left';
+    c.strokeStyle='#1f2529';c.lineWidth=2;c.beginPath();c.moveTo(x(cur),0);c.lineTo(x(cur),H);c.stroke();c.lineWidth=1;
+  }
+  function show(t){
+    t=Math.max(0,Math.min(NT-1,Math.round(t)));if(t===last)return;last=t;cur=t;
+    drawMap(map,t,DARK0,LANDD);spark();
+    const d=dateOf(t),v=N34[t];dEl.textContent=d.txt;
+    sEl.textContent='Niño 3.4 '+(v>=0?'+':'−')+Math.abs(v).toFixed(1)+' °C · '+phase(v);
+  }
+  function fromEvent(e,el){const r=el.getBoundingClientRect();return (e.clientX-r.left)/r.width*(NT-1);}
+  [map,sp].forEach(el=>el.addEventListener('pointermove',e=>show(fromEvent(e,el))));
+  document.getElementById('nowBtn').addEventListener('click',()=>show(NT-1));
+  show(cur);
+})();
+
+// ---------- opening: news numbers count up each time they come into view ----------
+(function(){
+  function run(el){const to=+el.dataset.to,pre=el.dataset.pre.replace('&gt;','>'),suf=el.dataset.suf;
+    if(reduce||to>1000){el.textContent=pre+to+suf;return;}  // years stay fixed
+    const t0=performance.now()+(+el.dataset.k)*150;
+    const step=now=>{const f=Math.min(1,Math.max(0,(now-t0)/1100)),e=1-Math.pow(1-f,3);el.textContent=pre+Math.round(to*e)+suf;if(f<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)run(e.target);}),{threshold:1});
+  document.querySelectorAll('.clip .num').forEach((el,k)=>{el.dataset.k=innerWidth>1000?k:0;io.observe(el);});
+})();
+
+// ---------- chapter 2: equatorial cross-section ----------
+const XS=(function(){
+  const S={normal:{w:330,e:200,wind:1,cloud:180,upw:1,cur:0,mid:'#f0a46f',east:'#7fb4e6',t:'Normal conditions',n:'Easterly trade winds, warm pool in the west'},
+           nino:{w:285,e:262,wind:.25,cloud:520,upw:.15,cur:1,mid:'#ec7a3d',east:'#ef7b2c',t:'El Niño',n:'Weak winds, warm water spreads east'},
+           nina:{w:350,e:178,wind:1.5,cloud:130,upw:1.6,cur:-1.5,mid:'#9fc3e6',east:'#4f93d8',t:'La Niña',n:'Strong winds, cold water wells up in the east'},
+           puzzle:{w:285,e:262,wind:.25,cloud:520,upw:.15,cur:1,mid:'#ec7a3d',east:'#ef7b2c',t:'Why is the warm swing bigger?',n:'Nonlinear feedback, or noise that grows with warmth?'}};
+  const warm=document.getElementById('warm'),th=document.getElementById('thermo'),lbl=document.getElementById('thLbl'),cloud=document.getElementById('cloud'),winds=document.getElementById('winds'),upw=document.getElementById('upw');
+  let cur={...S.normal},target=S.normal,raf=0;
+  const thY=(x,c)=>{const f=(x-70)/(860-70);return c.w+(c.e-c.w)*(f*f*(3-2*f));};
+  function render(c){
+    let top='M70 150 L860 150',low='';for(let x=860;x>=70;x-=10)low+=` L${x} ${thY(x,c).toFixed(1)}`;
+    warm.setAttribute('d',top+low+' Z');
+    let t='';for(let x=70;x<=860;x+=10)t+=(x===70?'M':' L')+x+' '+thY(x,c).toFixed(1);th.setAttribute('d',t);
+    lbl.setAttribute('y',(thY(450,c)+22).toFixed(1));
+    cloud.setAttribute('transform',`translate(${c.cloud.toFixed(1)},0)`);
+    const n=Math.max(1,Math.round(1+c.wind*2.6));let w='';for(let i=0;i<n;i++){const x0=760-i*150,y0=124-(i%2)*12,len=40+70*c.wind;w+=`<path d="M${x0} ${y0} L${(x0-len).toFixed(0)} ${y0}" stroke-width="${(2+1.6*c.wind).toFixed(1)}" opacity="${Math.min(1,.35+.5*c.wind).toFixed(2)}"/>`;}winds.innerHTML=w;
+    upw.setAttribute('opacity',Math.min(1,c.upw).toFixed(2));
+    // u: zonal current arrow in the central Pacific, length and direction follow the state
+    const ux=400,uy=217,ul=34+30*Math.abs(c.cur),dir=c.cur<0?-1:1;
+    document.getElementById('uArrow').setAttribute('d',`M${(ux-dir*ul/2).toFixed(1)} ${uy+18} L${(ux+dir*ul/2).toFixed(1)} ${uy+18}`);
+    document.getElementById('uArrow').setAttribute('opacity',Math.abs(c.cur)<.15?0:1);
+    document.getElementById('uChip').setAttribute('x',ux-17);document.getElementById('uTxt').setAttribute('x',ux);
+    document.getElementById('uChip').setAttribute('y',uy-24);document.getElementById('uTxt').setAttribute('y',uy-8);document.getElementById('uLbl').setAttribute('x',ux+60);document.getElementById('uLbl').setAttribute('y',uy-8);
+    // h_W: depth of the warm layer in the west
+    const hx=90,hy=thY(hx,c);document.getElementById('hBar').setAttribute('d',`M${hx-6} 152 L${hx+6} 152 M${hx} 152 L${hx} ${hy.toFixed(1)} M${hx-6} ${hy.toFixed(1)} L${hx+6} ${hy.toFixed(1)}`);
+    const hm=(152+hy)/2;document.getElementById('hChip').setAttribute('y',(hm-11).toFixed(1));document.getElementById('hTxt').setAttribute('y',(hm+5).toFixed(1));document.getElementById('hLbl').setAttribute('y',(hm+4).toFixed(1));
+    const wx=c.cloud,east=Math.min(840,wx+260+200*c.wind);document.getElementById('walker').setAttribute('d',`M${wx.toFixed(0)} 52 C ${(wx+40).toFixed(0)} 18, ${(east-40).toFixed(0)} 18, ${east.toFixed(0)} 60 L ${east.toFixed(0)} 96`);document.getElementById('walker').setAttribute('opacity',(.35+.45*Math.min(1,c.wind)).toFixed(2));const wl=document.getElementById('walkLbl');wl.setAttribute('x',((wx+east)/2).toFixed(0));wl.setAttribute('y','14');wl.setAttribute('text-anchor','middle');
+  }
+  function anim(){let done=true;['w','e','wind','cloud','upw','cur'].forEach(k=>{const dv=target[k]-cur[k];if(Math.abs(dv)>.01){cur[k]+=dv*.12;done=false;}else cur[k]=target[k];});render(cur);if(!done)raf=requestAnimationFrame(anim);}
+  const HL={normal:['vTC','vTE','vU','vH','vTau'],nino:['vTE','vTau','vU','vTC'],nina:['vH','vTau','vTE']};
+  function set(k){target=S[k];['vTC','vTE','vU','vH','vTau'].forEach(id=>{const e=document.getElementById(id);e.style.transition='opacity .4s';e.style.opacity=(HL[k]||[]).includes(id)?1:.22;});document.getElementById('sstMid').setAttribute('stop-color',S[k].mid);document.getElementById('sstEast').setAttribute('stop-color',S[k].east);
+    document.getElementById('xsTitle').textContent=S[k].t;document.getElementById('xsNote').textContent=S[k].n;
+    document.getElementById('windLbl').textContent=(k==='normal'||k==='nina')?'trade winds':'weak trade winds';
+    cancelAnimationFrame(raf);if(reduce){cur={...target};render(cur);}else anim();}
+  render(cur);return {set};
+})();
+
+// ---------- scrolly steps ----------
+const examG=[...document.querySelectorAll('.exam .g')];
+function setExam(k){examG.forEach(g=>g.classList.toggle('on',+g.dataset.g<=k));}
+setExam(0);
+// each scrolly gets a track of n screens; the active card is picked from scroll progress, so cards swap in place
+const SCR=[...document.querySelectorAll('.scrolly')].map(box=>{
+  const steps=box.querySelector('.steps'),cards=[...steps.querySelectorAll('.step')],stack=document.createElement('div');stack.className='stack';
+  cards.forEach(c=>stack.appendChild(c));const dots=document.createElement('div');dots.className='dots';dots.innerHTML=cards.map(()=>'<i></i>').join('');stack.appendChild(dots);
+  steps.appendChild(stack);return {box,steps,cards,dots:[...dots.children],cur:-1};
+});
+function narrow(){return matchMedia('(max-width:860px)').matches;}
+function layoutScrolly(){SCR.forEach(o=>{o.steps.style.height=narrow()?'':(o.cards.length*75+40)+'vh';});}
+function pick(o,i){if(i===o.cur)return;o.cur=i;o.cards.forEach((c,k)=>c.classList.toggle('on',k===i));o.dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+  const st=o.cards[i];if(o.box.dataset.scrolly==='xs')XS.set(st.dataset.s);else setExam(+st.dataset.s);}
+function onScroll(){SCR.forEach(o=>{
+  if(narrow()){let best=0,bd=1e9;o.cards.forEach((c,k)=>{const r=c.getBoundingClientRect(),d=Math.abs(r.top+r.height/2-innerHeight*.6);if(d<bd){bd=d;best=k;}});pick(o,best);return;}
+  const r=o.steps.getBoundingClientRect(),p=(innerHeight*.5-r.top)/(r.height-innerHeight*.3);
+  pick(o,Math.max(0,Math.min(o.cards.length-1,Math.floor(p*o.cards.length))));});}
+layoutScrolly();onScroll();addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',()=>{layoutScrolly();onScroll();});
+
+// chapter pill + progress
+const chs=[...document.querySelectorAll('[data-name]')],pill=document.getElementById('pillTxt'),prog=document.getElementById('prog');
+addEventListener('scroll',()=>{const y=scrollY+innerHeight*.35;let cur=chs[0];chs.forEach(c=>{if(c.offsetTop<=y)cur=c;});pill.textContent=cur.dataset.name;
+  prog.style.width=(scrollY/(document.documentElement.scrollHeight-innerHeight)*100)+'%';},{passive:true});
+
+const LOGO={"claude": "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjFlbSIgc3R5bGU9ImZsZXg6bm9uZTtsaW5lLWhlaWdodDoxIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPkNsYXVkZTwvdGl0bGU+PHBhdGggZD0iTTQuNzA5IDE1Ljk1NWw0LjcyLTIuNjQ3LjA4LS4yMy0uMDgtLjEyOEg5LjJsLS43OS0uMDQ4LTIuNjk4LS4wNzMtMi4zMzktLjA5Ny0yLjI2Ni0uMTIyLS41NzEtLjEyMUwwIDExLjc4NGwuMDU1LS4zNTIuNDgtLjMyMS42ODYuMDYgMS41Mi4xMDMgMi4yNzguMTU4IDEuNjUyLjA5NyAyLjQ0OS4yNTVoLjM4OWwuMDU1LS4xNTctLjEzNC0uMDk4LS4xMDMtLjA5Ny0yLjM1OC0xLjU5Ni0yLjU1Mi0xLjY4OC0xLjMzNi0uOTcyLS43MjQtLjQ5MS0uMzY0LS40NjItLjE1OC0xLjAwOC42NTYtLjcyMi44ODEuMDYuMjI1LjA2MS44OTMuNjg2IDEuOTA4IDEuNDc2IDIuNDkxIDEuODMzLjM2NS4zMDQuMTQ1LS4xMDMuMDE5LS4wNzMtLjE2NC0uMjc0LTEuMzU1LTIuNDQ2LTEuNDQ2LTIuNDktLjY0NC0xLjAzMi0uMTctLjYxOWEyLjk3IDIuOTcgMCAwMS0uMTA0LS43MjlMNi4yODMuMTM0IDYuNjk2IDBsLjk5Ni4xMzQuNDIuMzY0LjYyIDEuNDE0IDEuMDAyIDIuMjI5IDEuNTU1IDMuMDMuNDU2Ljg5OC4yNDMuODMyLjA5MS4yNTVoLjE1OFY5LjAxbC4xMjgtMS43MDYuMjM3LTIuMDk1LjIzLTIuNjk1LjA4LS43Ni4zNzYtLjkxLjc0Ny0uNDkyLjU4NC4yOC40OC42ODUtLjA2Ny40NDQtLjI4NiAxLjg1MS0uNTU5IDIuOTAzLS4zNjQgMS45NDJoLjIxMmwuMjQzLS4yNDIuOTg1LTEuMzA2IDEuNjUyLTIuMDY0LjczLS44Mi44NS0uOTA0LjU0Ny0uNDMxaDEuMDMzbC43NiAxLjEyOS0uMzQgMS4xNjYtMS4wNjQgMS4zNDctLjg4MSAxLjE0Mi0xLjI2NCAxLjctLjc5IDEuMzYuMDczLjExLjE4OC0uMDIgMi44NTYtLjYwNiAxLjU0My0uMjggMS44NDEtLjMxNS44MzMuMzg4LjA5MS4zOTUtLjMyOC44MDctMS45NjkuNDg2LTIuMzA5LjQ2Mi0zLjQzOS44MTMtLjA0Mi4wMy4wNDkuMDYxIDEuNTQ5LjE0Ni42NjIuMDM2aDEuNjIybDMuMDIuMjI1Ljc5LjUyMi40NzQuNjM4LS4wNzkuNDg1LTEuMjE1LjYyLTEuNjQtLjM4OS0zLjgyOS0uOTEtMS4zMTItLjMyOWgtLjE4MnYuMTFsMS4wOTMgMS4wNjggMi4wMDYgMS44MSAyLjUwOSAyLjMzLjEyNy41NzgtLjMyMi40NTUtLjM0LS4wNDktMi4yMDUtMS42NTctLjg1MS0uNzQ3LTEuOTI2LTEuNjJoLS4xMjh2LjE3bC40NDQuNjQ5IDIuMzQ1IDMuNTIxLjEyMiAxLjA4LS4xNy4zNTMtLjYwOC4yMTMtLjY2OC0uMTIyLTEuMzc0LTEuOTI1LTEuNDE1LTIuMTY3LTEuMTQzLTEuOTQzLS4xNC4wOC0uNjc0IDcuMjU0LS4zMTYuMzctLjcyOS4yOC0uNjA3LS40NjEtLjMyMi0uNzQ3LjMyMi0xLjQ3Ni4zODktMS45MjQuMzE1LTEuNTMuMjg2LTEuOS4xNy0uNjMyLS4wMTItLjA0Mi0uMTQuMDE4LTEuNDM0IDEuOTY3LTIuMTggMi45NDUtMS43MjYgMS44NDUtLjQxNC4xNjQtLjcxNy0uMzcuMDY3LS42NjIuNDAxLS41ODkgMi4zODgtMy4wMzYgMS40NC0xLjg4Mi45My0xLjA4Ni0uMDA2LS4xNThoLS4wNTVMNC4xMzIgMTguNTZsLTEuMTMuMTQ2LS40ODctLjQ1Ni4wNjEtLjc0Ni4yMzEtLjI0MyAxLjkwOC0xLjMxMi0uMDA2LjAwNnoiIGZpbGw9IiNEOTc3NTciIGZpbGwtcnVsZT0ibm9uemVybyI+PC9wYXRoPjwvc3ZnPg==", "openai": "data:image/svg+xml;base64,PHN2ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGZpbGwtcnVsZT0iZXZlbm9kZCIgaGVpZ2h0PSIxZW0iIHN0eWxlPSJmbGV4Om5vbmU7bGluZS1oZWlnaHQ6MSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0aXRsZT5PcGVuQUk8L3RpdGxlPjxwYXRoIGQ9Ik05LjIwNSA4LjY1OHYtMi4yNmMwLS4xOS4wNzItLjMzMy4yMzgtLjQyOGw0LjU0My0yLjYxNmMuNjE5LS4zNTcgMS4zNTYtLjUyMyAyLjExNy0uNTIzIDIuODU0IDAgNC42NjIgMi4yMTIgNC42NjIgNC41NjYgMCAuMTY3IDAgLjM1Ny0uMDI0LjU0N2wtNC43MS0yLjc1OWEuNzk3Ljc5NyAwIDAwLS44NTYgMGwtNS45NyAzLjQ3M3ptMTAuNjA5IDguOFYxMi4wNmMwLS4zMzMtLjE0My0uNTctLjQyOS0uNzM3bC01Ljk3LTMuNDczIDEuOTUtMS4xMThhLjQzMy40MzMgMCAwMS40NzYgMGw0LjU0MyAyLjYxN2MxLjMwOS43NiAyLjE4OSAyLjM3OCAyLjE4OSAzLjk0OCAwIDEuODA4LTEuMDcgMy40NzMtMi43NiA0LjE2M3pNNy44MDIgMTIuNzAzbC0xLjk1LTEuMTQyYy0uMTY3LS4wOTUtLjIzOS0uMjM4LS4yMzktLjQyOFY1Ljg5OWMwLTIuNTQ1IDEuOTUtNC40NzIgNC41OTEtNC40NzIgMSAwIDEuOTI3LjMzMyAyLjcxMi45MjhMOC4yMyA1LjA2N2MtLjI4NS4xNjYtLjQyOC40MDQtLjQyOC43Mzd2Ni44OTh6TTEyIDE1LjEyOGwtMi43OTUtMS41N3YtMy4zM0wxMiA4LjY1OGwyLjc5NSAxLjU3djMuMzNMMTIgMTUuMTI4em0xLjc5NiA3LjIzYy0xIDAtMS45MjctLjMzMi0yLjcxMi0uOTI3bDQuNjg2LTIuNzEyYy4yODUtLjE2Ni40MjgtLjQwNC40MjgtLjczN3YtNi44OThsMS45NzQgMS4xNDJjLjE2Ny4wOTUuMjM4LjIzOC4yMzguNDI4djUuMjMzYzAgMi41NDUtMS45NzQgNC40NzItNC42MTQgNC40NzJ6bS01LjYzNy01LjMwM2wtNC41NDQtMi42MTdjLTEuMzA4LS43NjEtMi4xODgtMi4zNzgtMi4xODgtMy45NDhBNC40ODIgNC40ODIgMCAwMTQuMjEgNi4zMjd2NS40MjNjMCAuMzMzLjE0My41NzEuNDI4LjczOGw1Ljk0NyAzLjQ0OS0xLjk1IDEuMTE4YS40MzIuNDMyIDAgMDEtLjQ3NiAwem0tLjI2MiAzLjljLTIuNjg4IDAtNC42NjItMi4wMjEtNC42NjItNC41MTkgMC0uMTkuMDI0LS4zOC4wNDctLjU3bDQuNjg2IDIuNzFjLjI4Ni4xNjcuNTcxLjE2Ny44NTYgMGw1Ljk3LTMuNDQ4djIuMjZjMCAuMTktLjA3LjMzMy0uMjM3LjQyOGwtNC41NDMgMi42MTZjLS42MTkuMzU3LTEuMzU2LjUyMy0yLjExNy41MjN6bTUuODk5IDIuODNhNS45NDcgNS45NDcgMCAwMDUuODI3LTQuNzU2QzIyLjI4NyAxOC4zMzkgMjQgMTUuODQgMjQgMTMuMjk2YzAtMS42NjUtLjcxMy0zLjI4Mi0xLjk5OC00LjQ0OC4xMTktLjUuMTktLjk5OS4xOS0xLjQ5OCAwLTMuNDAxLTIuNzU5LTUuOTQ3LTUuOTQ2LTUuOTQ3LS42NDIgMC0xLjI2LjA5NS0xLjg4LjMxQTUuOTYyIDUuOTYyIDAgMDAxMC4yMDUgMGE1Ljk0NyA1Ljk0NyAwIDAwLTUuODI3IDQuNzU3QzEuNzEzIDUuNDQ3IDAgNy45NDUgMCAxMC40OWMwIDEuNjY2LjcxMyAzLjI4MyAxLjk5OCA0LjQ0OC0uMTE5LjUtLjE5IDEtLjE5IDEuNDk5IDAgMy40MDEgMi43NTkgNS45NDYgNS45NDYgNS45NDYuNjQyIDAgMS4yNi0uMDk1IDEuODgtLjMwOWE1Ljk2IDUuOTYgMCAwMDQuMTYyIDEuNzEzeiI+PC9wYXRoPjwvc3ZnPg==", "gemini": "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjFlbSIgc3R5bGU9ImZsZXg6bm9uZTtsaW5lLWhlaWdodDoxIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPkdlbWluaTwvdGl0bGU+PHBhdGggZD0iTTIwLjYxNiAxMC44MzVhMTQuMTQ3IDE0LjE0NyAwIDAxLTQuNDUtMy4wMDEgMTQuMTExIDE0LjExMSAwIDAxLTMuNjc4LTYuNDUyLjUwMy41MDMgMCAwMC0uOTc1IDAgMTQuMTM0IDE0LjEzNCAwIDAxLTMuNjc5IDYuNDUyIDE0LjE1NSAxNC4xNTUgMCAwMS00LjQ1IDMuMDAxYy0uNjUuMjgtMS4zMTguNTA1LTIuMDAyLjY3OGEuNTAyLjUwMiAwIDAwMCAuOTc1Yy42ODQuMTcyIDEuMzUuMzk3IDIuMDAyLjY3N2ExNC4xNDcgMTQuMTQ3IDAgMDE0LjQ1IDMuMDAxIDE0LjExMiAxNC4xMTIgMCAwMTMuNjc5IDYuNDUzLjUwMi41MDIgMCAwMC45NzUgMGMuMTcyLS42ODUuMzk3LTEuMzUxLjY3Ny0yLjAwM2ExNC4xNDUgMTQuMTQ1IDAgMDEzLjAwMS00LjQ1IDE0LjExMyAxNC4xMTMgMCAwMTYuNDUzLTMuNjc4LjUwMy41MDMgMCAwMDAtLjk3NSAxMy4yNDUgMTMuMjQ1IDAgMDEtMi4wMDMtLjY3OHoiIGZpbGw9IiMzMTg2RkYiPjwvcGF0aD48cGF0aCBkPSJNMjAuNjE2IDEwLjgzNWExNC4xNDcgMTQuMTQ3IDAgMDEtNC40NS0zLjAwMSAxNC4xMTEgMTQuMTExIDAgMDEtMy42NzgtNi40NTIuNTAzLjUwMyAwIDAwLS45NzUgMCAxNC4xMzQgMTQuMTM0IDAgMDEtMy42NzkgNi40NTIgMTQuMTU1IDE0LjE1NSAwIDAxLTQuNDUgMy4wMDFjLS42NS4yOC0xLjMxOC41MDUtMi4wMDIuNjc4YS41MDIuNTAyIDAgMDAwIC45NzVjLjY4NC4xNzIgMS4zNS4zOTcgMi4wMDIuNjc3YTE0LjE0NyAxNC4xNDcgMCAwMTQuNDUgMy4wMDEgMTQuMTEyIDE0LjExMiAwIDAxMy42NzkgNi40NTMuNTAyLjUwMiAwIDAwLjk3NSAwYy4xNzItLjY4NS4zOTctMS4zNTEuNjc3LTIuMDAzYTE0LjE0NSAxNC4xNDUgMCAwMTMuMDAxLTQuNDUgMTQuMTEzIDE0LjExMyAwIDAxNi40NTMtMy42NzguNTAzLjUwMyAwIDAwMC0uOTc1IDEzLjI0NSAxMy4yNDUgMCAwMS0yLjAwMy0uNjc4eiIgZmlsbD0idXJsKCNsb2JlLWljb25zLWdlbWluaS0wLV9SXzBfKSI+PC9wYXRoPjxwYXRoIGQ9Ik0yMC42MTYgMTAuODM1YTE0LjE0NyAxNC4xNDcgMCAwMS00LjQ1LTMuMDAxIDE0LjExMSAxNC4xMTEgMCAwMS0zLjY3OC02LjQ1Mi41MDMuNTAzIDAgMDAtLjk3NSAwIDE0LjEzNCAxNC4xMzQgMCAwMS0zLjY3OSA2LjQ1MiAxNC4xNTUgMTQuMTU1IDAgMDEtNC40NSAzLjAwMWMtLjY1LjI4LTEuMzE4LjUwNS0yLjAwMi42NzhhLjUwMi41MDIgMCAwMDAgLjk3NWMuNjg0LjE3MiAxLjM1LjM5NyAyLjAwMi42NzdhMTQuMTQ3IDE0LjE0NyAwIDAxNC40NSAzLjAwMSAxNC4xMTIgMTQuMTEyIDAgMDEzLjY3OSA2LjQ1My41MDIuNTAyIDAgMDAuOTc1IDBjLjE3Mi0uNjg1LjM5Ny0xLjM1MS42NzctMi4wMDNhMTQuMTQ1IDE0LjE0NSAwIDAxMy4wMDEtNC40NSAxNC4xMTMgMTQuMTEzIDAgMDE2LjQ1My0zLjY3OC41MDMuNTAzIDAgMDAwLS45NzUgMTMuMjQ1IDEzLjI0NSAwIDAxLTIuMDAzLS42Nzh6IiBmaWxsPSJ1cmwoI2xvYmUtaWNvbnMtZ2VtaW5pLTEtX1JfMF8pIj48L3BhdGg+PHBhdGggZD0iTTIwLjYxNiAxMC44MzVhMTQuMTQ3IDE0LjE0NyAwIDAxLTQuNDUtMy4wMDEgMTQuMTExIDE0LjExMSAwIDAxLTMuNjc4LTYuNDUyLjUwMy41MDMgMCAwMC0uOTc1IDAgMTQuMTM0IDE0LjEzNCAwIDAxLTMuNjc5IDYuNDUyIDE0LjE1NSAxNC4xNTUgMCAwMS00LjQ1IDMuMDAxYy0uNjUuMjgtMS4zMTguNTA1LTIuMDAyLjY3OGEuNTAyLjUwMiAwIDAwMCAuOTc1Yy42ODQuMTcyIDEuMzUuMzk3IDIuMDAyLjY3N2ExNC4xNDcgMTQuMTQ3IDAgMDE0LjQ1IDMuMDAxIDE0LjExMiAxNC4xMTIgMCAwMTMuNjc5IDYuNDUzLjUwMi41MDIgMCAwMC45NzUgMGMuMTcyLS42ODUuMzk3LTEuMzUxLjY3Ny0yLjAwM2ExNC4xNDUgMTQuMTQ1IDAgMDEzLjAwMS00LjQ1IDE0LjExMyAxNC4xMTMgMCAwMTYuNDUzLTMuNjc4LjUwMy41MDMgMCAwMDAtLjk3NSAxMy4yNDUgMTMuMjQ1IDAgMDEtMi4wMDMtLjY3OHoiIGZpbGw9InVybCgjbG9iZS1pY29ucy1nZW1pbmktMi1fUl8wXykiPjwvcGF0aD48ZGVmcz48bGluZWFyR3JhZGllbnQgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGlkPSJsb2JlLWljb25zLWdlbWluaS0wLV9SXzBfIiB4MT0iNyIgeDI9IjExIiB5MT0iMTUuNSIgeTI9IjEyIj48c3RvcCBzdG9wLWNvbG9yPSIjMDhCOTYyIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDhCOTYyIiBzdG9wLW9wYWNpdHk9IjAiPjwvc3RvcD48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgaWQ9ImxvYmUtaWNvbnMtZ2VtaW5pLTEtX1JfMF8iIHgxPSI4IiB4Mj0iMTEuNSIgeTE9IjUuNSIgeTI9IjExIj48c3RvcCBzdG9wLWNvbG9yPSIjRjk0NTQzIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjk0NTQzIiBzdG9wLW9wYWNpdHk9IjAiPjwvc3RvcD48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgaWQ9ImxvYmUtaWNvbnMtZ2VtaW5pLTItX1JfMF8iIHgxPSIzLjUiIHgyPSIxNy41IiB5MT0iMTMuNSIgeTI9IjEyIj48c3RvcCBzdG9wLWNvbG9yPSIjRkFCQzEyIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIuNDYiIHN0b3AtY29sb3I9IiNGQUJDMTIiIHN0b3Atb3BhY2l0eT0iMCI+PC9zdG9wPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjwvc3ZnPg==", "kimi": "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjFlbSIgc3R5bGU9ImZsZXg6bm9uZTtsaW5lLWhlaWdodDoxIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPktpbWk8L3RpdGxlPjxwYXRoIGQ9Ik0yMS44NDYgMGExLjkyMyAxLjkyMyAwIDExMCAzLjg0NkgyMC4xNWEuMjI2LjIyNiAwIDAxLS4yMjctLjIyNlYxLjkyM0MxOS45MjMuODYxIDIwLjc4NCAwIDIxLjg0NiAweiIgZmlsbD0iIzE3ODNGRiI+PC9wYXRoPjxwYXRoIGQ9Ik0xMS4wNjUgMTEuMTk5bDcuMjU3LTcuMmMuMTM3LS4xMzYuMDYtLjQxLS4xMTYtLjQxSDE0LjNhLjE2NC4xNjQgMCAwMC0uMTE3LjA1MWwtNy44MiA3Ljc1NmMtLjEyMi4xMi0uMzAyLjAxMy0uMzAyLS4xNzlWMy44MmMwLS4xMjctLjA4My0uMjMtLjE4NS0uMjNIMy4xODZjLS4xMDMgMC0uMTg2LjEwMy0uMTg2LjIzVjE5Ljc3YzAgLjEyOC4wODMuMjMuMTg2LjIzaDIuNjljLjEwMyAwIC4xODYtLjEwMi4xODYtLjIzdi0zLjI1YzAtLjA2OS4wMjUtLjEzNS4wNjktLjE3OGwyLjQyNC0yLjQwNmEuMTU4LjE1OCAwIDAxLjIwNS0uMDIzbDYuNDg0IDQuNzcyYTcuNjc3IDcuNjc3IDAgMDAzLjQ1MyAxLjI4M2MuMTA4LjAxMi4yLS4wOTUuMi0uMjN2LTMuMDZjMC0uMTE3LS4wNy0uMjEyLS4xNjQtLjIyN2E1LjAyOCA1LjAyOCAwIDAxLTIuMDI3LS44MDdsLTUuNjEzLTQuMDY0Yy0uMTE3LS4wNzgtLjEzMi0uMjc5LS4wMjgtLjM4MXoiIGZpbGw9IiNmZmYiPjwvcGF0aD48L3N2Zz4=", "deepseek": "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjFlbSIgc3R5bGU9ImZsZXg6bm9uZTtsaW5lLWhlaWdodDoxIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPkRlZXBTZWVrPC90aXRsZT48cGF0aCBkPSJNMjMuNzQ4IDQuNDgyYy0uMjU0LS4xMjQtLjM2NC4xMTMtLjUxMi4yMzQtLjA1MS4wMzktLjA5NC4wOS0uMTM3LjEzNi0uMzcyLjM5Ny0uODA2LjY1Ny0xLjM3My42MjYtLjgyOS0uMDQ2LTEuNTM3LjIxNC0yLjE2My44NDgtLjEzMy0uNzgyLS41NzUtMS4yNDgtMS4yNDctMS41NDgtLjM1Mi0uMTU2LS43MDgtLjMxMS0uOTU1LS42NS0uMTcyLS4yNDEtLjIxOS0uNTEtLjMwNS0uNzc0LS4wNTUtLjE2LS4xMS0uMzIzLS4yOTMtLjM1LS4yLS4wMzEtLjI3OC4xMzYtLjM1Ni4yNzYtLjMxMy41NzItLjQzNCAxLjIwMi0uNDIyIDEuODQuMDI3IDEuNDM2LjYzMyAyLjU4IDEuODM4IDMuMzkzLjEzNy4wOTMuMTcyLjE4Ny4xMjkuMzIzLS4wODIuMjgtLjE4LjU1Mi0uMjY2LjgzMy0uMDU1LjE3OS0uMTM3LjIxNy0uMzI5LjE0YTUuNTI2IDUuNTI2IDAgMDEtMS43MzYtMS4xOGMtLjg1Ny0uODI4LTEuNjMxLTEuNzQyLTIuNTk3LTIuNDU4YTExLjM2NSAxMS4zNjUgMCAwMC0uNjg5LS40NzFjLS45ODUtLjk1Ny4xMy0xLjc0My4zODgtMS44MzYuMjctLjA5OC4wOTMtLjQzMi0uNzc5LS40MjgtLjg3Mi4wMDQtMS42Ny4yOTUtMi42ODcuNjg0YTMuMDU1IDMuMDU1IDAgMDEtLjQ2NS4xMzcgOS41OTcgOS41OTcgMCAwMC0yLjg4My0uMTAyYy0xLjg4NS4yMS0zLjM5IDEuMTAyLTQuNDk3IDIuNjIzQy4wODIgOC42MDYtLjIzMSAxMC42ODQuMTUyIDEyLjg1Yy40MDMgMi4yODQgMS41NjkgNC4xNzUgMy4zNiA1LjY1MyAxLjg1OCAxLjUzMyAzLjk5NyAyLjI4NCA2LjQzOCAyLjE0IDEuNDgyLS4wODUgMy4xMzMtLjI4NCA0Ljk5NC0xLjg2LjQ3LjIzNC45NjIuMzI3IDEuNzguMzk3LjYzLjA1OSAxLjIzNi0uMDMgMS43MDUtLjEyOC43MzUtLjE1Ni42ODQtLjgzNy40MTktLjk2MS0yLjE1NS0xLjAwNC0xLjY4Mi0uNTk1LTIuMTEzLS45MjYgMS4wOTYtMS4yOTYgMi43NDYtMi42NDIgMy4zOTItNy4wMDMuMDUtLjM0Ny4wMDctLjU2NSAwLS44NDUtLjAwNC0uMTcuMDM1LS4yMzcuMjMtLjI1NmE0LjE3MyA0LjE3MyAwIDAwMS41NDUtLjQ3NWMxLjM5Ni0uNzYzIDEuOTYtMi4wMTUgMi4wOTMtMy41MTcuMDItLjIzLS4wMDQtLjQ2Ny0uMjQ3LS41ODh6TTExLjU4MSAxOGMtMi4wODktMS42NDItMy4xMDItMi4xODMtMy41Mi0yLjE2LS4zOTIuMDI0LS4zMjEuNDcxLS4yMzUuNzYzLjA5LjI4OC4yMDcuNDg2LjM3MS43MzkuMTE0LjE2Ny4xOTIuNDE2LS4xMTMuNjAzLS42NzMuNDE2LTEuODQyLS4xNC0xLjg5Ny0uMTY3LTEuMzYxLS44MDItMi41LTEuODYtMy4zMDEtMy4zMDctLjc3NC0xLjM5My0xLjIyNC0yLjg4Ny0xLjI5OC00LjQ4Mi0uMDItLjM4Ni4wOTMtLjUyMi40NzctLjU5MmE0LjY5NiA0LjY5NiAwIDAxMS41MjktLjAzOWMyLjEzMi4zMTIgMy45NDYgMS4yNjUgNS40NjggMi43NzQuODY4Ljg2IDEuNTI1IDEuODg3IDIuMjAyIDIuODkxLjcyIDEuMDY2IDEuNDk0IDIuMDgyIDIuNDggMi45MTQuMzQ4LjI5Mi42MjUuNTE0Ljg5MS42NzctLjgwMi4wOS0yLjE0LjExLTMuMDU0LS42MTR6bTEtNi40NGEuMzA2LjMwNiAwIDAxLjQxNS0uMjg3LjMwMi4zMDIgMCAwMS4yLjI4OC4zMDYuMzA2IDAgMDEtLjMxLjMwNy4zMDMuMzAzIDAgMDEtLjMwNC0uMzA4em0zLjExIDEuNTk2Yy0uMi4wODEtLjM5OS4xNTEtLjU5LjE2YTEuMjQ1IDEuMjQ1IDAgMDEtLjc5OC0uMjU0Yy0uMjc0LS4yMy0uNDctLjM1OC0uNTUyLS43NThhMS43MyAxLjczIDAgMDEuMDE2LS41ODhjLjA3LS4zMjctLjAwOC0uNTM3LS4yMzktLjcyNy0uMTg3LS4xNTYtLjQyNi0uMTk5LS42ODgtLjE5OWEuNTU5LjU1OSAwIDAxLS4yNTQtLjA3OGMtLjExLS4wNTQtLjItLjE5LS4xMTQtLjM1OC4wMjgtLjA1NC4xNi0uMTg2LjE5Mi0uMjEuMzU2LS4yMDIuNzY3LS4xMzYgMS4xNDYuMDE2LjM1Mi4xNDQuNjE4LjQwOCAxLjAwMS43ODIuMzkxLjQ1MS40NjIuNTc2LjY4NS45MTQuMTc2LjI2NS4zMzYuNTM3LjQ0NS44NDguMDY3LjE5NS0uMDE5LjM1NC0uMjUuNDUyeiIgZmlsbD0iIzRENkJGRSI+PC9wYXRoPjwvc3ZnPg==", "minimax": "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjFlbSIgc3R5bGU9ImZsZXg6bm9uZTtsaW5lLWhlaWdodDoxIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPk1pbmltYXg8L3RpdGxlPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0ibG9iZS1pY29ucy1taW5pbWF4LV9SXzBfIiB4MT0iMCUiIHgyPSIxMDAuMTgyJSIgeTE9IjUwLjA1NyUiIHkyPSI1MC4wNTclIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRTIxNjdFIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkU2MDNDIj48L3N0b3A+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE2LjI3OCAyYzEuMTU2IDAgMi4wOTMuOTI3IDIuMDkzIDIuMDd2MTIuNTAxYS43NC43NCAwIDAwLjc0NC43MDkuNzQuNzQgMCAwMC43NDMtLjcwOVY5LjA5OWEyLjA2IDIuMDYgMCAwMTIuMDcxLTIuMDQ5QTIuMDYgMi4wNiAwIDAxMjQgOS4xdjYuNTYxYS42NDkuNjQ5IDAgMDEtLjY1Mi42NDUuNjQ5LjY0OSAwIDAxLS42NTMtLjY0NVY5LjFhLjc2Mi43NjIgMCAwMC0uNzY2LS43NTguNzYyLjc2MiAwIDAwLS43NjYuNzU4djcuNDcyYTIuMDM3IDIuMDM3IDAgMDEtMi4wNDggMi4wMjYgMi4wMzcgMi4wMzcgMCAwMS0yLjA0OC0yLjAyNnYtMTIuNWEuNzg1Ljc4NSAwIDAwLS43ODgtLjc1My43ODUuNzg1IDAgMDAtLjc4OS43NTJsLS4wMDEgMTUuOTA0QTIuMDM3IDIuMDM3IDAgMDExMy40NDEgMjJhMi4wMzcgMi4wMzcgMCAwMS0yLjA0OC0yLjAyNlYxOC4wNGMwLS4zNTYuMjkyLS42NDUuNjUyLS42NDUuMzYgMCAuNjUyLjI4OS42NTIuNjQ1djEuOTM0YzAgLjI2My4xNDIuNTA2LjM3Mi42MzguMjMuMTMxLjUxNC4xMzEuNzQ0IDBhLjczNC43MzQgMCAwMC4zNzItLjYzOFY0LjA3YzAtMS4xNDMuOTM3LTIuMDcgMi4wOTMtMi4wN3ptLTUuNjc0IDBjMS4xNTYgMCAyLjA5My45MjcgMi4wOTMgMi4wN3YxMS41MjNhLjY0OC42NDggMCAwMS0uNjUyLjY0NS42NDguNjQ4IDAgMDEtLjY1Mi0uNjQ1VjQuMDdhLjc4NS43ODUgMCAwMC0uNzg5LS43OC43ODUuNzg1IDAgMDAtLjc4OS43OHYxNC4wMTNhMi4wNiAyLjA2IDAgMDEtMi4wNyAyLjA0OCAyLjA2IDIuMDYgMCAwMS0yLjA3MS0yLjA0OFY5LjFhLjc2Mi43NjIgMCAwMC0uNzY2LS43NTguNzYyLjc2MiAwIDAwLS43NjYuNzU4djMuOGEyLjA2IDIuMDYgMCAwMS0yLjA3MSAyLjA0OUEyLjA2IDIuMDYgMCAwMTAgMTIuOXYtMS4zNzhjMC0uMzU3LjI5Mi0uNjQ2LjY1Mi0uNjQ2LjM2IDAgLjY1My4yOS42NTMuNjQ2VjEyLjljMCAuNDE4LjM0My43NTcuNzY2Ljc1N3MuNzY2LS4zMzkuNzY2LS43NTdWOS4wOTlhMi4wNiAyLjA2IDAgMDEyLjA3LTIuMDQ4IDIuMDYgMi4wNiAwIDAxMi4wNzEgMi4wNDh2OC45ODRjMCAuNDE5LjM0My43NTguNzY3Ljc1OC40MjMgMCAuNzY2LS4zMzkuNzY2LS43NThWNC4wN2MwLTEuMTQzLjkzNy0yLjA3IDIuMDkzLTIuMDd6IiBmaWxsPSJ1cmwoI2xvYmUtaWNvbnMtbWluaW1heC1fUl8wXykiIGZpbGwtcnVsZT0ibm9uemVybyI+PC9wYXRoPjwvc3ZnPg==", "glm": "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjFlbSIgc3R5bGU9ImZsZXg6bm9uZTtsaW5lLWhlaWdodDoxIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPlpoaXB1PC90aXRsZT48cGF0aCBkPSJNMTEuOTkxIDIzLjUwM2EuMjQuMjQgMCAwMC0uMjQ0LjI0OC4yNC4yNCAwIDAwLjI0NC4yNDkuMjQuMjQgMCAwMC4yNDUtLjI0OS4yNC4yNCAwIDAwLS4yMi0uMjQ3bC0uMDI1LS4wMDF6TTkuNjcxIDUuMzY1YTEuNjk3IDEuNjk3IDAgMDExLjA5OSAyLjEzMmwtLjA3MS4xNzItLjAxNi4wNC0uMDE4LjA1NGMtLjA3LjE2LS4xMDQuMzItLjEwNC40OTgtLjAzNS43MS40NyAxLjI3OSAxLjE4NiAxLjMxNGguMzY2YzEuMzA5LjA1MyAyLjMzOCAxLjE3MyAyLjI4NiAyLjUyMy0uMDUyIDEuMzMyLTEuMTUyIDIuMzgtMi40NzggMi4zMjdoLS4xNzRjLS43MTUuMDE4LTEuMjc0LjY0LTEuMjM5IDEuMzY4IDAgLjEyNC4wMTguMjMuMDUzLjMzNy4yMDkuMzczLjU0LjY1OC45Ni44Ljc1LjIzIDEuNTE3LS4xMjUgMS45LS43ODJsLjAxOC0uMDM1Yy40MDItLjY0IDEuMTctLjk2IDEuOTItLjcxMS44NTQuMjg0IDEuMzc4IDEuMjI2IDEuMDk5IDIuMTY3YTEuNjYxIDEuNjYxIDAgMDEtMi4wNzcgMS4xMDIgMS43MTEgMS43MTEgMCAwMS0uOTA3LS43MTFsLS4wMTctLjAzNWMtLjItLjMyMy0uNDYzLS41OC0uODUxLS43MTFsLS4wNTYtLjAxOGExLjY0NiAxLjY0NiAwIDAwLTEuOTU0Ljc0NiAxLjY2IDEuNjYgMCAwMS0xLjA2NS43NjQgMS42NzcgMS42NzcgMCAwMS0xLjk4OS0xLjI3OWMtLjIwOS0uOTA2LjMzMi0xLjgzIDEuMjU3LTIuMDQzYTEuNTEgMS41MSAwIDAxLjI5Ni0uMDM1aC4wMThjLjY4LS4wNzEgMS4xNTEtLjYyMiAxLjExNi0xLjMzM2ExLjMwNyAxLjMwNyAwIDAwLS4yMjctLjY5MyAyLjUxNSAyLjUxNSAwIDAxLS4zNjYtMS40MDMgMi4zOSAyLjM5IDAgMDEuMzY2LTEuMjA4Yy4xNC0uMTk1LjIxLS40NDQuMjI3LS42OTMuMDE4LS43MS0uNTA2LTEuMjYxLTEuMTg2LTEuMzMybC0uMDctLjAxOGExLjQzIDEuNDMgMCAwMS0uMjk5LS4wN2wtLjA1LS4wMTlhMS43IDEuNyAwIDAxLTEuMDQ3LTIuMTE0IDEuNjggMS42OCAwIDAxMi4wOTQtMS4xMDF6bS01LjU3NSAxMC4xMWMuMjYtLjI2NC42MzktLjM2Ny45OTQtLjI3LjM1NS4wOTYuNjMzLjM3OS43MjguNzQuMDk1LjM2Mi0uMDA3Ljc0OC0uMjY3IDEuMDEzLS40MDIuNDEtMS4wNTMuNDEtMS40NTUgMGExLjA2MiAxLjA2MiAwIDAxMC0xLjQ4MnptMTQuODQ1LS4yOTRjLjM1OS0uMDkuNzM4LjAyNC45OTIuMjk3LjI1NC4yNzQuMzQ0LjY2NS4yMzcgMS4wMjUtLjEwNy4zNi0uMzk2LjYzNC0uNzU2LjcxOC0uNTUxLjEyOC0xLjEtLjIyLTEuMjMtLjc4MWExLjA1IDEuMDUgMCAwMS43NTctMS4yNnptLS4wNjQtNC4zOWMuMzE0LjMyLjQ5Ljc1My40OSAxLjIwNiAwIC40NTItLjE3Ni44ODYtLjQ5IDEuMjA2LS4zMTUuMzItLjc0LjUtMS4xODUuNS0uNDQ0IDAtLjg3LS4xOC0xLjE4NC0uNWExLjcyNyAxLjcyNyAwIDAxMC0yLjQxMiAxLjY1NCAxLjY1NCAwIDAxMi4zNjkgMHptLTExLjI0My4xNjNjLjM2NC40ODQuNDQ3IDEuMTI4LjIxOCAxLjY5MWExLjY2NSAxLjY2NSAwIDAxLTIuMTg4LjkyM2MtLjg1NS0uMzYtMS4yNi0xLjM1OC0uOTA3LTIuMjI4YTEuNjggMS42OCAwIDAxMS4zMy0xLjAzOGMuNTkzLS4wOCAxLjE4My4xNjkgMS41NDcuNjUyem0xMS41NDUtNC4yMjFjLjM2OCAwIC43MDguMi44OTIuNTI0LjE4NC4zMjQuMTg0LjcyNCAwIDEuMDQ4YTEuMDI2IDEuMDI2IDAgMDEtLjg5Mi41MjRjLS41NjggMC0xLjAzLS40Ny0xLjAzLTEuMDQ4IDAtLjU3OS40NjItMS4wNDggMS4wMy0xLjA0OHptLTE0LjM1OCAwYy4zNjggMCAuNzA3LjIuODkxLjUyNC4xODQuMzI0LjE4NC43MjQgMCAxLjA0OGExLjAyNiAxLjAyNiAwIDAxLS44OTEuNTI0Yy0uNTY5IDAtMS4wMy0uNDctMS4wMy0xLjA0OCAwLS41NzkuNDYxLTEuMDQ4IDEuMDMtMS4wNDh6bTEwLjAzMS0xLjQ3NWMuOTI1IDAgMS42NzUuNzY0IDEuNjc1IDEuNzA2cy0uNzUgMS43MDUtMS42NzUgMS43MDUtMS42NzQtLjc2My0xLjY3NC0xLjcwNWMwLS45NDIuNzUtMS43MDYgMS42NzQtMS43MDZ6bS0yLjYyNi0uNjg0Yy4zNjItLjA4Mi42NTMtLjM1Ni43NjEtLjcxOGExLjA2MiAxLjA2MiAwIDAwLS4yMzgtMS4wMjggMS4wMTcgMS4wMTcgMCAwMC0uOTk2LS4yOTRjLS41NDcuMTQtLjg4MS43LS43NTIgMS4yNTcuMTMuNTU4LjY3NS45MDcgMS4yMjUuNzgzem0wIDE2Ljg3NmMuMzU5LS4wODcuNjQ0LS4zNi43NS0uNzJhMS4wNjIgMS4wNjIgMCAwMC0uMjM3LTEuMDE5IDEuMDE4IDEuMDE4IDAgMDAtLjk4NS0uMzAxIDEuMDM3IDEuMDM3IDAgMDAtLjc2Mi43MTdjLS4xMDguMzYxLS4wMTcuNzU0LjIzOSAxLjAyOC4yNDUuMjYzLjYwNi4zNzcuOTUzLjMwNWwuMDQzLS4wMXpNMTcuMTkgMy41YS42MzEuNjMxIDAgMDAuNjI4LS42NGMwLS4zNTUtLjI3OS0uNjQtLjYyOC0uNjRhLjYzMS42MzEgMCAwMC0uNjI4LjY0YzAgLjM1NS4yOC42NC42MjguNjR6bS0xMC4zOCAwYS42MzEuNjMxIDAgMDAuNjI4LS42NGMwLS4zNTUtLjI4LS42NC0uNjI4LS42NGEuNjMxLjYzMSAwIDAwLS42MjguNjRjMCAuMzU1LjI3OS42NC42MjguNjR6bS01LjE4MiA3Ljg1MmEuNjMxLjYzMSAwIDAwLS42MjguNjRjMCAuMzU0LjI4LjYzOS42MjguNjM5YS42My42MyAwIDAwLjYyNy0uNjA2bC4wMDEtLjAzNGEuNjIuNjIgMCAwMC0uNjI4LS42NHptNS4xODIgOS4xM2EuNjMxLjYzMSAwIDAwLS42MjguNjRjMCAuMzU1LjI3OS42NC42MjguNjRhLjYzMS42MzEgMCAwMC42MjgtLjY0YzAtLjM1NS0uMjgtLjY0LS42MjgtLjY0em0xMC4zOC4wMThhLjYzMS42MzEgMCAwMC0uNjI4LjY0YzAgLjM1NS4yOC42NC42MjguNjRhLjYzMS42MzEgMCAwMC42MjgtLjY0YzAtLjM1NS0uMjc5LS42NC0uNjI4LS42NHptNS4xODItOS4xNDhhLjYzMS42MzEgMCAwMC0uNjI4LjY0YzAgLjM1NC4yNzkuNjM5LjYyOC42MzlhLjYzMS42MzEgMCAwMC42MjgtLjY0YzAtLjM1NS0uMjgtLjY0LS42MjgtLjY0em0tLjM4NC00Ljk5MmEuMjQuMjQgMCAwMC4yNDQtLjI0OS4yNC4yNCAwIDAwLS4yNDQtLjI0OS4yNC4yNCAwIDAwLS4yNDQuMjQ5YzAgLjE0Mi4xMjIuMjQ5LjI0NC4yNDl6TTExLjk5MS40OTdhLjI0LjI0IDAgMDAuMjQ1LS4yNDhBLjI0LjI0IDAgMDAxMS45OSAwYS4yNC4yNCAwIDAwLS4yNDQuMjQ5YzAgLjEzMy4xMDguMjM2LjIyMy4yNDdsLjAyMS4wMDF6TTIuMDExIDYuMzZhLjI0LjI0IDAgMDAuMjQ1LS4yNDkuMjQuMjQgMCAwMC0uMjQ0LS4yNDkuMjQuMjQgMCAwMC0uMjQ0LjI0OS4yNC4yNCAwIDAwLjI0NC4yNDl6bTAgMTEuMjYzYS4yNC4yNCAwIDAwLS4yNDMuMjQ4LjI0LjI0IDAgMDAuMjQ0LjI0OS4yNC4yNCAwIDAwLjI0NC0uMjQ5LjI1Mi4yNTIgMCAwMC0uMjQ0LS4yNDh6bTE5Ljk5NS0uMDE4YS4yNC4yNCAwIDAwLS4yNDUuMjQ4LjI0LjI0IDAgMDAuMjQ1LjI1LjI0LjI0IDAgMDAuMjQ0LS4yNS4yNTIuMjUyIDAgMDAtLjI0NC0uMjQ4eiIgZmlsbD0iIzM4NTlGRiIgZmlsbC1ydWxlPSJub256ZXJvIj48L3BhdGg+PC9zdmc+", "qwen": "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjFlbSIgc3R5bGU9ImZsZXg6bm9uZTtsaW5lLWhlaWdodDoxIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPlF3ZW48L3RpdGxlPjxwYXRoIGQ9Ik0xMi42MDQgMS4zNGMuMzkzLjY5Ljc4NCAxLjM4MiAxLjE3NCAyLjA3NWEuMTguMTggMCAwMC4xNTcuMDkxaDUuNTUyYy4xNzQgMCAuMzIyLjExLjQ0Ni4zMjdsMS40NTQgMi41N2MuMTkuMzM3LjI0LjQ3OC4wMjQuODM3LS4yNi40My0uNTEzLjg2NC0uNzYgMS4zbC0uMzY3LjY1OGMtLjEwNi4xOTYtLjIyMy4yOC0uMDQuNTEybDIuNjUyIDQuNjM3Yy4xNzIuMzAxLjExMS40OTQtLjA0My43Ny0uNDM3Ljc4NS0uODgyIDEuNTY0LTEuMzM1IDIuMzQtLjE1OS4yNzItLjM1Mi4zNzUtLjY4LjM3LS43NzctLjAxNi0xLjU1Mi0uMDEtMi4zMjcuMDE2YS4wOTkuMDk5IDAgMDAtLjA4MS4wNSA1NzUuMDk3IDU3NS4wOTcgMCAwMS0yLjcwNSA0Ljc0Yy0uMTY5LjI5My0uMzguMzYzLS43MjUuMzY0LS45OTcuMDAzLTIuMDAyLjAwNC0zLjAxNy4wMDJhLjUzNy41MzcgMCAwMS0uNDY1LS4yNzFsLTEuMzM1LTIuMzIzYS4wOS4wOSAwIDAwLS4wODMtLjA0OUg0Ljk4MmMtLjI4NS4wMy0uNTUzLS4wMDEtLjgwNS0uMDkybC0xLjYwMy0yLjc3YS41NDMuNTQzIDAgMDEtLjAwMi0uNTRsMS4yMDctMi4xMmEuMTk4LjE5OCAwIDAwMC0uMTk3IDU1MC45NTEgNTUwLjk1MSAwIDAxLTEuODc1LTMuMjcybC0uNzktMS4zOTVjLS4xNi0uMzEtLjE3My0uNDk2LjA5NS0uOTY1LjQ2NS0uODEzLjkyNy0xLjYyNSAxLjM4Ny0yLjQzNi4xMzItLjIzNC4zMDQtLjMzNC41ODQtLjMzNWEzMzguMyAzMzguMyAwIDAxMi41ODktLjAwMS4xMjQuMTI0IDAgMDAuMTA3LS4wNjNsMi44MDYtNC44OTVhLjQ4OC40ODggMCAwMS40MjItLjI0NmMuNTI0LS4wMDEgMS4wNTMgMCAxLjU4My0uMDA2TDExLjcwNCAxYy4zNDEtLjAwMy43MjQuMDMyLjkuMzR6bS0zLjQzMi40MDNhLjA2LjA2IDAgMDAtLjA1Mi4wM0w2LjI1NCA2Ljc4OGEuMTU3LjE1NyAwIDAxLS4xMzUuMDc4SDMuMjUzYy0uMDU2IDAtLjA3LjAyNS0uMDQxLjA3NGw1LjgxIDEwLjE1NmMuMDI1LjA0Mi4wMTMuMDYyLS4wMzQuMDYzbC0yLjc5NS4wMTVhLjIxOC4yMTggMCAwMC0uMi4xMTZsLTEuMzIgMi4zMWMtLjA0NC4wNzgtLjAyMS4xMTguMDY4LjExOGw1LjcxNi4wMDhjLjA0NiAwIC4wOC4wMi4xMDQuMDYxbDEuNDAzIDIuNDU0Yy4wNDYuMDgxLjA5Mi4wODIuMTM5IDBsNS4wMDYtOC43Ni43ODMtMS4zODJhLjA1NS4wNTUgMCAwMS4wOTYgMGwxLjQyNCAyLjUzYS4xMjIuMTIyIDAgMDAuMTA3LjA2MmwyLjc2My0uMDJhLjA0LjA0IDAgMDAuMDM1LS4wMi4wNDEuMDQxIDAgMDAwLS4wNGwtMi45LTUuMDg2YS4xMDguMTA4IDAgMDEwLS4xMTNsLjI5My0uNTA3IDEuMTItMS45NzdjLjAyNC0uMDQxLjAxMi0uMDYyLS4wMzUtLjA2Mkg5LjJjLS4wNTkgMC0uMDczLS4wMjYtLjA0My0uMDc3bDEuNDM0LTIuNTA1YS4xMDcuMTA3IDAgMDAwLS4xMTRMOS4yMjUgMS43NzRhLjA2LjA2IDAgMDAtLjA1My0uMDMxem02LjI5IDguMDJjLjA0NiAwIC4wNTguMDIuMDM0LjA2bC0uODMyIDEuNDY1LTIuNjEzIDQuNTg1YS4wNTYuMDU2IDAgMDEtLjA1LjAyOS4wNTguMDU4IDAgMDEtLjA1LS4wMjlMOC40OTggOS44NDFjLS4wMi0uMDM0LS4wMS0uMDUyLjAyOC0uMDU0bC4yMTYtLjAxMiA2LjcyMi0uMDEyeiIgZmlsbD0idXJsKCNsb2JlLWljb25zLXF3ZW4tX1JfMF8pIiBmaWxsLXJ1bGU9Im5vbnplcm8iPjwvcGF0aD48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImxvYmUtaWNvbnMtcXdlbi1fUl8wXyIgeDE9IjAlIiB4Mj0iMTAwJSIgeTE9IjAlIiB5Mj0iMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2MzM2RTciIHN0b3Atb3BhY2l0eT0iLjg0Ij48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNkY2OUY3IiBzdG9wLW9wYWNpdHk9Ii44NCI+PC9zdG9wPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjwvc3ZnPg=="};
+const logoOf=n=>/^Claude/.test(n)?'claude':/^GPT/.test(n)?'openai':/^Gemini/.test(n)?'gemini':/^Kimi/.test(n)?'kimi':/^DeepSeek/.test(n)?'deepseek':/^MiniMax/.test(n)?'minimax':/^GLM/.test(n)?'glm':/^Qwen/.test(n)?'qwen':null;
+const logoImg=(n,sz)=>{const k=logoOf(n);return k?`<span class="lg${k==='kimi'?' dk':''}" style="width:${sz}px;height:${sz}px"><img src="${LOGO[k]}" alt="" width="${Math.round(sz*.62)}" height="${Math.round(sz*.62)}"></span>`:'';};
+
+// ---------- chapter 4: leaderboard ----------
+(function(){
+  const R={n:'Reference model',s:.728,d:.323,p:.157,c:.378,ref:true};
+  const M=[['Claude Fable 5.1',.715,.639,.274,.515],['Kimi K3',.620,.570,.305,.479],['GPT-5.6-Sol',.554,.515,.306,.443],['GPT-6 Astra',.530,.629,.237,.442],['Claude Opus 5',.548,.589,.247,.440],['GPT-5.5',.412,.595,.252,.403],['Gemini 3.8 Flash',.406,.503,.241,.369],['DeepSeek V4.1 Flash',.418,.508,.183,.351],['DeepSeek V4 Pro',.285,.530,.251,.345],['MiniMax-M3',.231,.326,.136,.222],['GLM-5.2',.222,.261,.108,.188],['Qwen3-Max',.118,.062,0,.054]].map(a=>({n:a[0],s:a[1],d:a[2],p:a[3],c:a[4]}));
+  const ids=['wS','wD','wP'],lb=document.getElementById('lb'),tip=document.getElementById('tip');
+  const W=()=>{const v=ids.map(i=>+document.getElementById(i).value),t=v.reduce((a,b)=>a+b,0)||1;return v.map(x=>x/t);};
+  function render(){
+    const [a,b,c]=W();ids.forEach((id,k)=>document.getElementById(id+'v').textContent=[a,b,c][k].toFixed(2));
+    const paper=ids.every((id,k)=>+document.getElementById(id).value===[30,30,40][k]);
+    const comp=m=>paper?m.c:a*m.s+b*m.d+c*m.p,rc=comp(R);
+    lb.innerHTML=[...M,R].sort((x,y)=>comp(y)-comp(x)).map(m=>{const v=comp(m),tot=a*m.s+b*m.d+c*m.p||1;
+      return `<div class="row${m.ref?' ref':''}" role="listitem" tabindex="0" data-n="${m.n}"><span class="nm">${m.ref?'':logoImg(m.n,20)}${m.n}</span><span class="bb"><span class="bars" style="width:${v/0.6*100}%"><i style="width:${a*m.s/tot*100}%;background:#7e9cb3"></i><i style="width:${b*m.d/tot*100}%;background:#2f80d6"></i><i style="width:${c*m.p/tot*100}%;background:#ef7b2c"></i></span><span class="rl" style="left:${rc/0.6*100}%"></span></span><span class="mono" style="text-align:right">${v.toFixed(3)}</span></div>`;}).join('');
+    document.getElementById('beat').textContent=M.filter(m=>comp(m)>rc).length;
+  }
+  const all=[...M,R];
+  lb.addEventListener('pointermove',e=>{const row=e.target.closest('.row');if(!row){tip.style.display='none';return;}const m=all.find(x=>x.n===row.dataset.n);
+    tip.innerHTML=`<b>${m.n}</b><div><span>Statistics</span><span class="mono">${m.s.toFixed(3)}</span></div><div><span>Dynamical consistency</span><span class="mono">${m.d.toFixed(3)}</span></div><div><span>Prediction</span><span class="mono">${m.p.toFixed(3)}</span></div>`;
+    tip.style.display='block';tip.style.left=Math.min(innerWidth-230,e.clientX+16)+'px';tip.style.top=(e.clientY+16)+'px';});
+  lb.addEventListener('pointerleave',()=>tip.style.display='none');
+  ids.forEach(i=>document.getElementById(i).addEventListener('input',render));
+  document.getElementById('resetW').addEventListener('click',()=>{[30,30,40].forEach((v,k)=>document.getElementById(ids[k]).value=v);render();});
+  render();
+})();
+
+// ---------- chapter 5: toy simulator ----------
+(function(){
+  const cv=document.getElementById('hist'),ctx=cv.getContext('2d'),eq=document.getElementById('eqn'),sk=document.getElementById('skewV'),sl=document.getElementById('str');
+  let mode='A';
+  // seeded normal generator so the picture is stable for a given setting
+  function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+  function simulate(){
+    const k=sl.value/100,u=rng(7),dt=0.05,sq=Math.sqrt(dt),N=160000,xs=new Float32Array(N);let x=0;
+    for(let i=0;i<N+2000;i++){
+      const g=Math.sqrt(-2*Math.log(u()+1e-12))*Math.cos(2*Math.PI*u());
+      if(mode==='A'){const b=0.9*k,amp=Math.max(0.15,1+b*x);x+=-x*dt+0.9*amp*sq*g;}
+      else{const c=0.9*k;x+=(-x+c*x*x-0.35*c*x*x*x)*dt+0.9*sq*g;}
+      if(i>=2000)xs[i-2000]=x;
+    }
+    let m=0;for(const v of xs)m+=v;m/=N;let v2=0,v3=0;for(const v of xs){const d=v-m;v2+=d*d;v3+=d*d*d;}v2/=N;v3/=N;
+    const sd=Math.sqrt(v2),skew=v3/Math.pow(v2,1.5);
+    // standardised histogram
+    const B=60,lo=-4,hi=4,h=new Float32Array(B);for(const v of xs){const z=(v-m)/sd;const b=Math.floor((z-lo)/(hi-lo)*B);if(b>=0&&b<B)h[b]++;}
+    return {h,skew,B,lo,hi,N};
+  }
+  function draw(){
+    const r=simulate(),W=cv.width,H=cv.height,pad=48;ctx.clearRect(0,0,W,H);
+    const bw=(W-2*pad)/r.B,peak=Math.max(...r.h);
+    const gx=z=>pad+(z-r.lo)/(r.hi-r.lo)*(W-2*pad), gy=c=>H-pad-c/peak*(H-2*pad-20);
+    ctx.strokeStyle='#d5dbdf';ctx.beginPath();ctx.moveTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();
+    for(let b=0;b<r.B;b++){const z=r.lo+(b+.5)*(r.hi-r.lo)/r.B;ctx.fillStyle=z>0?'#ef7b2c':'#2f80d6';ctx.globalAlpha=.85;ctx.fillRect(pad+b*bw+1,gy(r.h[b]),bw-2,H-pad-gy(r.h[b]));}
+    ctx.globalAlpha=1;
+    // symmetric reference curve
+    ctx.strokeStyle='#141c24';ctx.setLineDash([6,6]);ctx.lineWidth=2;ctx.beginPath();
+    for(let i=0;i<=200;i++){const z=r.lo+i/200*(r.hi-r.lo),c=r.N*(r.hi-r.lo)/r.B*Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);i?ctx.lineTo(gx(z),gy(c)):ctx.moveTo(gx(z),gy(c));}
+    ctx.stroke();ctx.setLineDash([]);ctx.lineWidth=1;
+    ctx.font='500 20px IBM Plex Mono, monospace';ctx.fillStyle='#56636e';
+    ctx.fillText('cold swings',pad,H-pad+30);ctx.textAlign='right';ctx.fillText('warm swings',W-pad,H-pad+30);ctx.textAlign='center';ctx.fillText('0',gx(0),H-pad+30);ctx.textAlign='left';
+    ctx.fillStyle='#141c24';ctx.fillText('- - symmetric reference',pad,pad-12);
+    sk.textContent=(r.skew>=0?'+':'−')+Math.abs(r.skew).toFixed(2);
+    const kk=sl.value/100*0.9;document.getElementById('parV').textContent=mode==='A'?'b = '+kk.toFixed(2):'c = '+kk.toFixed(2)+',  d = '+(0.35*kk).toFixed(2);
+  }
+  function setMode(m){mode=m;window.highlightBox&&window.highlightBox(m);document.getElementById('mA').setAttribute('aria-pressed',m==='A');document.getElementById('mB').setAttribute('aria-pressed',m==='B');
+    eq.textContent=m==='A'?'dT = −T dt + σ(1 + b·T) dW':'dT = (−T + c·T² − d·T³) dt + σ dW';document.getElementById('parLbl').textContent=m==='A'?'b, how fast the noise grows with temperature':'c, strength of the warm-side feedback (d = 0.35 c keeps it bounded)';draw();}
+  document.getElementById('mA').addEventListener('click',()=>setMode('A'));
+  document.getElementById('mB').addEventListener('click',()=>setMode('B'));
+  let raf=0;sl.addEventListener('input',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(draw);});
+  draw();
+})();
+
+// ---------- chapter 5: the vote ----------
+(function(){
+  const V=[['Claude Fable 5.1','CF','#c8643f','A',.542],['Kimi K3','K','#1f6feb','A',.465],['DeepSeek V4.1 Flash','DS','#4d6bfe','A',.391],['DeepSeek V4 Pro','DS','#4d6bfe','A',.340],
+           ['Claude Opus 5','CO','#c8643f','B',.473],['GPT-5.6-Sol','G','#0f8a6c','B',.464],['GPT-6 Astra','G','#0f8a6c','B',.462],['GPT-5.5','G','#0f8a6c','B',.398],['Gemini 3.8 Flash','Ge','#7b61ff','B',.362]];
+  const tok=v=>`<div class="tok">${logoImg(v[0],30)}<span>${v[0]}<small>${v[4].toFixed(3)}</small></span></div>`;
+  document.getElementById('tokA').innerHTML=V.filter(v=>v[3]==='A').map(tok).join('');
+  document.getElementById('tokB').innerHTML=V.filter(v=>v[3]==='B').map(tok).join('');
+  function drop(){if(reduce)return;const t=[...document.querySelectorAll('.tok')];t.forEach(e=>e.classList.add('pre'));void document.body.offsetWidth;t.forEach((e,i)=>setTimeout(()=>e.classList.remove('pre'),180*i+60));}
+  new IntersectionObserver(es=>{if(es[0].isIntersecting)drop();},{threshold:.35}).observe(document.getElementById('ballot'));
+  document.getElementById('replay').addEventListener('click',drop);
+  window.highlightBox=m=>{document.getElementById('boxA').classList.toggle('hot',m==='A');document.getElementById('boxB').classList.toggle('hot',m==='B');};
+  window.highlightBox('A');
+})();
+
+// ---------- copy BibTeX ----------
+document.getElementById('copyBib').addEventListener('click',async e=>{const txt=document.getElementById('bib').textContent;
+  try{await navigator.clipboard.writeText(txt);e.target.textContent='Copied';}catch(_){const r=document.createRange();r.selectNodeContents(document.getElementById('bib'));const s=getSelection();s.removeAllRanges();s.addRange(r);e.target.textContent='Selected, press Ctrl+C';}
+  setTimeout(()=>e.target.textContent='Copy BibTeX',2000);});
+</script>
+
+</html>
+<script>
+(()=>{const root=document.querySelector('.tests');if(!root)return;
+const N=48,X=i=>8+184*i/(N-1),xs=[...Array(N).keys()].map(i=>i/(N-1));
+const path=ys=>ys.map((y,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+y.toFixed(1)).join(' ');
+const g=(x,m,s)=>Math.exp(-((x-m)**2)/(2*s*s));
+const pdf=(m,s,sk)=>xs.map(x=>86-74*g(x,m+(x>m?0:0),x>m?s*(1+sk):s*(1-sk*.5)));
+const ts=(a,l,n)=>xs.map((x,i)=>48-a*(Math.sin(x*14+l)*.7+Math.sin(x*31+1.3+l)*.3)*28+n*Math.sin(x*57)*6);
+const fc=(k)=>xs.map(x=>86-80*Math.exp(-x*k));
+const T={stat:{tg:pdf(.42,.12,.7),m:[pdf(.43,.125,.6),pdf(.5,.1,0),pdf(.6,.2,-.3)],s:[.62,.38,.19],w:[5,8,12]},
+ dyn:{tg:ts(1,0,0),m:[ts(.95,.12,.15),ts(.7,.7,.3),ts(.3,1.6,.2)],s:[.71,.44,.17],w:[6,10,14]},
+ pred:{tg:fc(2.3),m:[fc(.85),fc(2.1),fc(3.6)],s:[.56,.33,.12],w:[5,7,9]}};
+const band=(ys,w)=>{const n=ys.length,f=i=>w*(0.55+0.45*i/(n-1));return ys.map((y,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Math.max(6,Math.min(86,y-f(i))).toFixed(1)).join(' ')+' '+ys.slice().reverse().map((y,j)=>'L'+X(n-1-j).toFixed(1)+' '+Math.max(6,Math.min(86,y+f(n-1-j))).toFixed(1)).join(' ')+' Z'};
+const cards=[...root.querySelectorAll('.t')].map(el=>{const k=el.dataset.t;el.querySelector('.tg').setAttribute('d',path(T[k].tg));return{el,k,md:el.querySelector('.md'),ci:el.querySelector('.ci'),sc:el.querySelector('.sc'),cur:T[k].m[0].slice(),s:0,w:T[k].w[0]}});
+const btns=[...root.querySelectorAll('.tpick button')];
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let cur=0,timer=null;
+function show(m){cur=m;btns.forEach((b,i)=>b.classList.toggle('on',i===m));
+ cards.forEach(c=>{const from=c.cur.slice(),to=T[c.k].m[m],s0=c.s,s1=T[c.k].s[m],w0=c.w,w1=T[c.k].w[m],t0=performance.now(),D=reduce?0:700;
+  const step=t=>{const p=D?Math.min(1,(t-t0)/D):1,e=p<.5?2*p*p:1-(-2*p+2)**2/2;c.cur=from.map((y,i)=>y+(to[i]-y)*e);c.s=s0+(s1-s0)*e;c.w=w0+(w1-w0)*e;c.md.setAttribute('d',path(c.cur));c.ci.setAttribute('d',band(c.cur,c.w));c.sc.textContent=c.s.toFixed(2);if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)})}
+function auto(){if(reduce)return;clearInterval(timer);timer=setInterval(()=>show((cur+1)%3),3200)}
+btns.forEach((b,i)=>{b.addEventListener('click',()=>{show(i);auto()})});
+root.addEventListener('mouseenter',()=>clearInterval(timer));root.addEventListener('mouseleave',auto);
+show(0);auto()})();
+</script>
