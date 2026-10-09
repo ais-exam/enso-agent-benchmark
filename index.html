@@ -51,6 +51,10 @@ a{color:inherit}
 .hl-w{background:linear-gradient(transparent 55%,rgba(255,206,64,.62) 55%,rgba(255,206,64,.62) 90%,transparent 90%);padding:0 .06em}
 .hl-c{background:linear-gradient(transparent 55%,rgba(42,111,219,.26) 55%,rgba(42,111,219,.26) 90%,transparent 90%);padding:0 .06em}
 .open .lede{font-size:clamp(17px,1.6vw,21px);color:#3c464d;max-width:62ch}
+.byline{display:flex;flex-direction:column;gap:4px;margin:-4px 0 6px}
+.byline .names{margin:0;font-size:clamp(16px,1.5vw,19px);font-weight:500;color:#10141b}
+.byline .affil{margin:0;font-size:clamp(13px,1.15vw,15px);color:#5b6670}
+.byline sup{font-size:.68em;margin-left:1px}
 .mapbox{position:relative;margin-top:6px}
 .mapbox canvas{display:block;width:100%;aspect-ratio:91/21;border-radius:10px;cursor:ew-resize;touch-action:pan-y}
 .maplabels{position:absolute;inset:0;pointer-events:none;font:500 11px "IBM Plex Mono",monospace;color:var(--night-muted)}
@@ -338,6 +342,10 @@ a{color:inherit}
     <div class="clips"><a class="clip" href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml" target="_blank" rel="noopener"><span class="src">NOAA<em>10 Sep 2026</em></span><span class="hd">El Niño Advisory</span><span class="num" data-pre="&gt;" data-to="90" data-suf="%">&gt;90%</span><span class="cap">chance of a very strong event this winter</span><span class="rd">Read ↗</span></a><a class="clip" href="https://news.un.org/en/story/2026/09/1168265" target="_blank" rel="noopener"><span class="src">UN News<em>3 Sep 2026</em></span><span class="hd">El Niño is surging. Months of extreme heat could follow</span><span class="num" data-pre="~" data-to="50" data-suf=" million">~50 million</span><span class="cap">more people pushed into acute hunger, warns the World Food Programme</span><span class="rd">Read ↗</span></a><a class="clip" href="https://weather.com/2026/09/29/news/weather/super-el-nino-us-drought-relief-outlook" target="_blank" rel="noopener"><span class="src">The Weather Channel<em>29 Sep 2026</em></span><span class="hd">Over half the US is in drought. Will super El Niño quench it?</span><span class="num" data-pre="" data-to="40" data-suf=" of 48">40 of 48</span><span class="cap">Lower 48 US states with some drought on the first day of fall</span><span class="rd">Read ↗</span></a><a class="clip" href="https://wmo.int/news/media-centre/new-report-suggests-more-global-temperature-records-ahead" target="_blank" rel="noopener"><span class="src">WMO<em>28 May 2026</em></span><span class="hd">New report suggests more global temperature records ahead</span><span class="num" data-pre="" data-to="2027" data-suf="">2027</span><span class="cap">El Niño raises the chance this becomes the next record-hot year</span><span class="rd">Read ↗</span></a></div>
     
     <h2 class="serif tt">SciExam for ENSO: Can AI agents do <span class="hl">climate science</span>?</h2>
+    <div class="byline">
+      <p class="names">Yinling Zhang<sup>1</sup>, Langchen Liu<sup>2</sup>, Dongbin Xiu<sup>1</sup>, Xueyan Zou<sup>3</sup>, Xu Kuang<sup>4</sup>, Mengdi Wang<sup>5</sup>, Shilong Liu<sup>5</sup></p>
+      <p class="affil"><sup>1</sup>The Ohio State University · <sup>2</sup>Yale University · <sup>3</sup>University of California, San Diego · <sup>4</sup>Stanford University · <sup>5</sup>Princeton University</p>
+    </div>
     <p class="lede">This year's El Niño may be the strongest on record, and scientists still debate what drives it. SciExam for ENSO hands AI agents raw ocean data and no answer key, then judges the models they build with hidden scientific tests.</p>
     <div class="mapbox">
       <canvas id="heroMap" width="1092" height="252" aria-label="Sea surface temperature anomalies across the tropical Pacific. Move the pointer across the map to travel through time."></canvas>
