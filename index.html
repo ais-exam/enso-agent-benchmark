@@ -55,6 +55,9 @@ a{color:inherit}
 .byline .names{margin:0;font-size:clamp(16px,1.5vw,19px);font-weight:500;color:#10141b}
 .byline .affil{margin:0;font-size:clamp(13px,1.15vw,15px);color:#5b6670}
 .byline sup{font-size:.68em;margin-left:1px}
+.byline .plinks{margin:6px 0 0;display:flex;gap:10px;flex-wrap:wrap}
+.byline .plinks a{font:500 14px "IBM Plex Sans",system-ui,sans-serif;text-decoration:none;color:#10141b;border:1px solid #d9d4c7;border-radius:999px;padding:4px 14px;background:rgba(255,255,255,.7)}
+.byline .plinks a:hover{border-color:#10141b}
 .mapbox{position:relative;margin-top:6px}
 .mapbox canvas{display:block;width:100%;aspect-ratio:91/21;border-radius:10px;cursor:ew-resize;touch-action:pan-y}
 .maplabels{position:absolute;inset:0;pointer-events:none;font:500 11px "IBM Plex Mono",monospace;color:var(--night-muted)}
@@ -345,6 +348,7 @@ a{color:inherit}
     <div class="byline">
       <p class="names">Yinling Zhang<sup>1</sup>, Langchen Liu<sup>2</sup>, Dongbin Xiu<sup>1</sup>, Xueyan Zou<sup>3</sup>, Xu Kuang<sup>4</sup>, Mengdi Wang<sup>5</sup>, Shilong Liu<sup>5</sup></p>
       <p class="affil"><sup>1</sup>The Ohio State University · <sup>2</sup>Yale University · <sup>3</sup>University of California, San Diego · <sup>4</sup>Stanford University · <sup>5</sup>Princeton University</p>
+      <p class="plinks"><a href="https://arxiv.org/abs/2610.10513" target="_blank" rel="noopener">arXiv</a><a href="https://github.com/ylzhang2447/SciExam-ENSO-code" target="_blank" rel="noopener">Code and data</a></p>
     </div>
     <p class="lede">This year's El Niño may be the strongest on record, and scientists still debate what drives it. SciExam for ENSO hands AI agents raw ocean data and no answer key, then judges the models they build with hidden scientific tests.</p>
     <div class="mapbox">
@@ -532,16 +536,20 @@ a{color:inherit}
   <div class="wrap">
     <p class="cnum" style="color:var(--night-muted)">Epilogue</p>
     <h2>AI agents can already propose climate models worth a scientist's time.</h2>
-    <div class="cta" style="margin-top:28px"><a class="btn fill" href="#end">Paper (coming soon)</a><a class="btn" href="https://github.com/ylzhang2447/SciExam-ENSO-code" target="_blank" rel="noopener">Code and data</a></div>
-    <pre id="bib">@article{zhang2026sciexam,
-  title  = {SciExam for ENSO: Can AI Agents Build Climate Models?},
-  author = {Zhang, Yinling and Liu, Langchen and Xiu, Dongbin and Zou, Xueyan
-            and Kuang, Xu and Wang, Mengdi and Liu, Shilong},
-  year   = {2026}
+    <div class="cta" style="margin-top:28px"><a class="btn fill" href="https://arxiv.org/abs/2610.10513" target="_blank" rel="noopener">Paper on arXiv</a><a class="btn" href="https://github.com/ylzhang2447/SciExam-ENSO-code" target="_blank" rel="noopener">Code and data</a></div>
+    <pre id="bib">@misc{zhang2026sciexamensoaiagents,
+  title         = {SciExam for ENSO: Can AI Agents Build Climate Models?},
+  author        = {Yinling Zhang and Langchen Liu and Dongbin Xiu and Xueyan Zou
+                   and Xu Kuang and Mengdi Wang and Shilong Liu},
+  year          = {2026},
+  eprint        = {2610.10513},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI},
+  url           = {https://arxiv.org/abs/2610.10513}
 }</pre>
     <button class="ghost" id="copyBib">Copy BibTeX</button>
     <div class="authors"><div class="n">Yinling Zhang¹, Langchen Liu², Dongbin Xiu¹, Xueyan Zou³, Xu Kuang⁴, Mengdi Wang⁵, Shilong Liu⁵</div><div>¹The Ohio State University · ²Yale University · ³University of California, San Diego · ⁴Stanford University · ⁵Princeton University</div></div>
-    <p class="foot">Sea surface temperature anomalies from NOAA ERSSTv5 (1991–2020 base period), January 1950 to August 2026. The paper link will be added on release.</p>
+    <p class="foot">Sea surface temperature anomalies from NOAA ERSSTv5 (1991–2020 base period), January 1950 to August 2026.</p>
   </div>
 </section>
 
